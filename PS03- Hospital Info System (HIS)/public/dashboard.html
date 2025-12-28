@@ -1,0 +1,1983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Hospital Information System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=25">
+    <link rel="stylesheet" href="css/enhanced.css?v=30">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard-page">
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="nav-left">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="logo">
+                <i class="fas fa-hospital"></i>
+                <span>MediCare Plus</span>
+            </div>
+        </div>
+        <div class="nav-right">
+            <div id="realTimeClock" class="tooltip" data-tooltip="Current Time"></div>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="globalSearch" placeholder="Search patients, appointments..." oninput="globalSearchHandler(this.value)" onkeypress="if(event.key==='Enter') executeGlobalSearch()">
+            </div>
+            <button class="nav-icon tooltip" id="notificationBtn" data-tooltip="Notifications" onclick="toggleNotifications()">
+                <i class="fas fa-bell"></i>
+                <span class="badge" id="notificationCount">0</span>
+            </button>
+            <div class="user-profile" id="userProfile">
+                <img src="https://ui-avatars.com/api/?name=Admin+User&background=4f46e5&color=fff" alt="User">
+                <span id="userName">Admin User</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-content">
+            <div class="sidebar-menu">
+                <a href="#overview" class="menu-item active" data-section="overview">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#opd" class="menu-item" data-section="opd">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>OPD Management</span>
+                </a>
+                <a href="#ipd" class="menu-item" data-section="ipd">
+                    <i class="fas fa-hospital-user"></i>
+                    <span>IPD Management</span>
+                </a>
+                <a href="#emergency" class="menu-item" data-section="emergency">
+                    <i class="fas fa-ambulance"></i>
+                    <span>Emergency</span>
+                </a>
+                <a href="#ot" class="menu-item" data-section="ot">
+                    <i class="fas fa-procedures"></i>
+                    <span>OT Scheduling</span>
+                </a>
+                <a href="#lab" class="menu-item" data-section="lab">
+                    <i class="fas fa-flask"></i>
+                    <span>Laboratory</span>
+                </a>
+                <a href="#radiology" class="menu-item" data-section="radiology">
+                    <i class="fas fa-x-ray"></i>
+                    <span>Radiology</span>
+                </a>
+                <a href="#pharmacy" class="menu-item" data-section="pharmacy">
+                    <i class="fas fa-pills"></i>
+                    <span>Pharmacy</span>
+                </a>
+                <a href="#billing" class="menu-item" data-section="billing">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Billing</span>
+                </a>
+                <a href="#insurance" class="menu-item" data-section="insurance">
+                    <i class="fas fa-file-medical-alt"></i>
+                    <span>Insurance</span>
+                </a>
+                <a href="#emr" class="menu-item" data-section="emr">
+                    <i class="fas fa-notes-medical"></i>
+                    <span>EMR</span>
+                </a>
+                <a href="#beds" class="menu-item" data-section="beds">
+                    <i class="fas fa-bed"></i>
+                    <span>Bed Management</span>
+                </a>
+                <a href="#hr" class="menu-item" data-section="hr">
+                    <i class="fas fa-users"></i>
+                    <span>HR Management</span>
+                </a>
+                <a href="#inventory" class="menu-item" data-section="inventory">
+                    <i class="fas fa-warehouse"></i>
+                    <span>Inventory</span>
+                </a>
+                <a href="#analytics" class="menu-item" data-section="analytics">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics & MIS</span>
+                </a>
+                <a href="#settings" class="menu-item" data-section="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </div>
+            <div class="sidebar-footer">
+                <a href="index.html" class="menu-item logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Overview Section -->
+        <section class="content-section active" id="overview">
+            <div class="section-header">
+                <h1>Dashboard Overview</h1>
+                <div class="header-actions">
+                    <span class="live-indicator"><i class="fas fa-circle"></i> Live</span>
+                    <button class="btn-export" onclick="exportDashboardData()"><i class="fas fa-download"></i> Export</button>
+                    <button class="btn-print" onclick="printReport('overview')"><i class="fas fa-print"></i> Print</button>
+                    <button class="btn-primary" onclick="refreshData()"><i class="fas fa-sync"></i> Refresh</button>
+                </div>
+            </div>
+
+            <!-- Quick Actions Bar -->
+            <div class="quick-actions-bar">
+                <button class="quick-action-btn" onclick="window.location.hash='opd'; document.getElementById('newOPDBtn').click();">
+                    <i class="fas fa-user-plus"></i>
+                    <span>New OPD</span>
+                </button>
+                <button class="quick-action-btn" onclick="window.location.hash='ipd'; document.getElementById('newIPDBtn').click();">
+                    <i class="fas fa-hospital-user"></i>
+                    <span>New Admission</span>
+                </button>
+                <button class="quick-action-btn emergency" onclick="window.location.hash='emergency'; document.getElementById('newEmergencyBtn').click();">
+                    <i class="fas fa-ambulance"></i>
+                    <span>Emergency</span>
+                </button>
+                <button class="quick-action-btn" onclick="window.location.hash='lab'; document.getElementById('newLabTestBtn').click();">
+                    <i class="fas fa-flask"></i>
+                    <span>Lab Order</span>
+                </button>
+                <button class="quick-action-btn" onclick="window.location.hash='billing'; document.getElementById('generateBillBtn').click();">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>New Bill</span>
+                </button>
+                <button class="quick-action-btn" onclick="window.location.hash='ot'; document.getElementById('scheduleOTBtn').click();">
+                    <i class="fas fa-procedures"></i>
+                    <span>Schedule OT</span>
+                </button>
+            </div>
+
+            <!-- Key Metrics - Primary Row -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon blue">
+                        <i class="fas fa-user-injured"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Total Patients</h3>
+                        <p class="metric-value" id="totalPatientsCount">0</p>
+                        <span class="metric-change positive" id="patientsTrend"><i class="fas fa-arrow-up"></i> 12% from last week</span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon green">
+                        <i class="fas fa-bed"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Bed Occupancy</h3>
+                        <p class="metric-value" id="bedOccupancyRate">0%</p>
+                        <span class="metric-subtitle" id="bedOccupancyDetail">0/0 beds occupied</span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon purple">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Today's Patients</h3>
+                        <p class="metric-value" id="appointmentsTodayCount">0</p>
+                        <span class="metric-subtitle" id="appointmentsDetail">Loading...</span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon orange">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Revenue Today</h3>
+                        <p class="metric-value" id="revenueTodayCount">₹0</p>
+                        <span class="metric-change positive" id="revenueTrend"><i class="fas fa-arrow-up"></i> vs yesterday</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Secondary Metrics Row -->
+            <div class="metrics-grid secondary">
+                <div class="metric-card mini">
+                    <div class="metric-icon-mini teal">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>OPD</h3>
+                        <p class="metric-value" id="opdTodayCount">0</p>
+                    </div>
+                </div>
+                <div class="metric-card mini">
+                    <div class="metric-icon-mini cyan">
+                        <i class="fas fa-hospital-user"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>IPD</h3>
+                        <p class="metric-value" id="ipdActiveCount">0</p>
+                    </div>
+                </div>
+                <div class="metric-card mini">
+                    <div class="metric-icon-mini red">
+                        <i class="fas fa-ambulance"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Emergency</h3>
+                        <p class="metric-value" id="emergencyActiveCount">0</p>
+                    </div>
+                </div>
+                <div class="metric-card mini">
+                    <div class="metric-icon-mini indigo">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Pending Labs</h3>
+                        <p class="metric-value" id="pendingLabsCount">0</p>
+                    </div>
+                </div>
+                <div class="metric-card mini">
+                    <div class="metric-icon-mini violet">
+                        <i class="fas fa-x-ray"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Pending Imaging</h3>
+                        <p class="metric-value" id="pendingImagingCount">0</p>
+                    </div>
+                </div>
+                <div class="metric-card mini">
+                    <div class="metric-icon-mini amber">
+                        <i class="fas fa-procedures"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Surgeries Today</h3>
+                        <p class="metric-value" id="surgeriesTodayCount">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Department Overview & Real-time Status -->
+            <div class="dashboard-grid-3col">
+                <!-- Department Cards -->
+                <div class="department-overview-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-building-columns"></i> Department Status</h3>
+                        <button class="btn-icon" onclick="refreshDepartmentStats()"><i class="fas fa-sync-alt"></i></button>
+                    </div>
+                    <div class="department-list" id="departmentStatusList">
+                        <div class="dept-item">
+                            <div class="dept-info">
+                                <span class="dept-color cardiology"></span>
+                                <span class="dept-name">Cardiology</span>
+                            </div>
+                            <div class="dept-stats">
+                                <span class="dept-count" id="deptCardiology">0</span>
+                                <span class="dept-label">patients</span>
+                            </div>
+                        </div>
+                        <div class="dept-item">
+                            <div class="dept-info">
+                                <span class="dept-color neurology"></span>
+                                <span class="dept-name">Neurology</span>
+                            </div>
+                            <div class="dept-stats">
+                                <span class="dept-count" id="deptNeurology">0</span>
+                                <span class="dept-label">patients</span>
+                            </div>
+                        </div>
+                        <div class="dept-item">
+                            <div class="dept-info">
+                                <span class="dept-color orthopedics"></span>
+                                <span class="dept-name">Orthopedics</span>
+                            </div>
+                            <div class="dept-stats">
+                                <span class="dept-count" id="deptOrthopedics">0</span>
+                                <span class="dept-label">patients</span>
+                            </div>
+                        </div>
+                        <div class="dept-item">
+                            <div class="dept-info">
+                                <span class="dept-color pediatrics"></span>
+                                <span class="dept-name">Pediatrics</span>
+                            </div>
+                            <div class="dept-stats">
+                                <span class="dept-count" id="deptPediatrics">0</span>
+                                <span class="dept-label">patients</span>
+                            </div>
+                        </div>
+                        <div class="dept-item">
+                            <div class="dept-info">
+                                <span class="dept-color general"></span>
+                                <span class="dept-name">General Medicine</span>
+                            </div>
+                            <div class="dept-stats">
+                                <span class="dept-count" id="deptGeneral">0</span>
+                                <span class="dept-label">patients</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- OT Status -->
+                <div class="ot-status-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-procedures"></i> Operation Theater</h3>
+                        <a href="#ot" class="btn-link">View All</a>
+                    </div>
+                    <div class="ot-status-grid" id="otStatusGrid">
+                        <div class="ot-room-status">
+                            <span class="ot-name">OT-1</span>
+                            <span class="ot-badge available">Available</span>
+                        </div>
+                        <div class="ot-room-status">
+                            <span class="ot-name">OT-2</span>
+                            <span class="ot-badge in-surgery">In Surgery</span>
+                        </div>
+                        <div class="ot-room-status">
+                            <span class="ot-name">OT-3</span>
+                            <span class="ot-badge available">Available</span>
+                        </div>
+                        <div class="ot-room-status">
+                            <span class="ot-name">OT-4</span>
+                            <span class="ot-badge maintenance">Maintenance</span>
+                        </div>
+                    </div>
+                    <div class="ot-summary">
+                        <div class="ot-summary-item">
+                            <span class="label">Today's Surgeries</span>
+                            <span class="value" id="otTodaySurgeries">0</span>
+                        </div>
+                        <div class="ot-summary-item">
+                            <span class="label">Upcoming</span>
+                            <span class="value" id="otUpcoming">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bed Availability -->
+                <div class="bed-status-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-bed"></i> Bed Availability</h3>
+                        <a href="#beds" class="btn-link">Manage</a>
+                    </div>
+                    <div class="bed-status-visual" id="bedStatusVisual">
+                        <div class="bed-donut">
+                            <svg viewBox="0 0 36 36" class="circular-chart">
+                                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                <path class="circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" id="bedDonutCircle"/>
+                                <text x="18" y="20.35" class="percentage" id="bedDonutText">0%</text>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="bed-legend">
+                        <div class="legend-item">
+                            <span class="legend-color occupied"></span>
+                            <span>Occupied</span>
+                            <strong id="bedsOccupied">0</strong>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color available"></span>
+                            <span>Available</span>
+                            <strong id="bedsAvailable">0</strong>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color critical"></span>
+                            <span>Critical</span>
+                            <strong id="bedsCritical">0</strong>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color maintenance"></span>
+                            <span>Maintenance</span>
+                            <strong id="bedsMaintenance">0</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="charts-row">
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-line"></i> Patient Flow</h3>
+                        <select class="chart-filter" id="patientFlowFilter" onchange="updatePatientFlowChart(this.value)">
+                            <option value="7">Last 7 Days</option>
+                            <option value="30">Last 30 Days</option>
+                            <option value="90">Last 3 Months</option>
+                        </select>
+                    </div>
+                    <canvas id="patientFlowChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-pie"></i> Department Distribution</h3>
+                    </div>
+                    <canvas id="departmentChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Revenue & Appointments Row -->
+            <div class="charts-row">
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-rupee-sign"></i> Revenue Trend</h3>
+                        <select class="chart-filter">
+                            <option>This Month</option>
+                            <option>Last 3 Months</option>
+                            <option>This Year</option>
+                        </select>
+                    </div>
+                    <canvas id="revenueTrendChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-bar"></i> Department Revenue</h3>
+                    </div>
+                    <canvas id="departmentRevenueChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Today's Schedule & Recent Activities -->
+            <div class="dashboard-grid-2col">
+                <!-- Today's Appointments Timeline -->
+                <div class="timeline-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-calendar-day"></i> Today's Schedule</h3>
+                        <span class="timeline-date" id="todayDateDisplay"></span>
+                    </div>
+                    <div class="timeline-container" id="todayTimeline">
+                        <!-- Timeline items will be populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Staff On Duty -->
+                <div class="staff-duty-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-user-md"></i> Staff On Duty</h3>
+                        <a href="#hr" class="btn-link">View All</a>
+                    </div>
+                    <div class="staff-duty-list" id="staffOnDutyList">
+                        <!-- Staff items will be populated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activities & Alerts -->
+            <div class="activity-section">
+                <div class="activity-card">
+                    <h3><i class="fas fa-clock"></i> Recent Admissions</h3>
+                    <div class="activity-list" id="recentAdmissions">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                    <a href="#ipd" class="card-footer-link">View all admissions <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="activity-card alerts">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Critical Alerts</h3>
+                    <div class="alert-list" id="criticalAlerts">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending Actions Summary -->
+            <div class="pending-actions-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-tasks"></i> Pending Actions</h3>
+                </div>
+                <div class="pending-grid">
+                    <div class="pending-item" onclick="window.location.hash='lab'">
+                        <div class="pending-icon labs"><i class="fas fa-flask"></i></div>
+                        <div class="pending-info">
+                            <span class="pending-count" id="pendingLabResults">0</span>
+                            <span class="pending-label">Lab Results Pending</span>
+                        </div>
+                    </div>
+                    <div class="pending-item" onclick="window.location.hash='radiology'">
+                        <div class="pending-icon imaging"><i class="fas fa-x-ray"></i></div>
+                        <div class="pending-info">
+                            <span class="pending-count" id="pendingImagingResults">0</span>
+                            <span class="pending-label">Imaging Pending</span>
+                        </div>
+                    </div>
+                    <div class="pending-item" onclick="window.location.hash='billing'">
+                        <div class="pending-icon billing"><i class="fas fa-file-invoice"></i></div>
+                        <div class="pending-info">
+                            <span class="pending-count" id="pendingBills">0</span>
+                            <span class="pending-label">Unpaid Bills</span>
+                        </div>
+                    </div>
+                    <div class="pending-item" onclick="window.location.hash='pharmacy'">
+                        <div class="pending-icon pharmacy"><i class="fas fa-pills"></i></div>
+                        <div class="pending-info">
+                            <span class="pending-count" id="pendingPrescriptions">0</span>
+                            <span class="pending-label">Prescriptions Pending</span>
+                        </div>
+                    </div>
+                    <div class="pending-item" onclick="window.location.hash='insurance'">
+                        <div class="pending-icon insurance"><i class="fas fa-file-medical-alt"></i></div>
+                        <div class="pending-info">
+                            <span class="pending-count" id="pendingClaims">0</span>
+                            <span class="pending-label">Insurance Claims</span>
+                        </div>
+                    </div>
+                    <div class="pending-item" onclick="window.location.hash='inventory'">
+                        <div class="pending-icon inventory"><i class="fas fa-warehouse"></i></div>
+                        <div class="pending-info">
+                            <span class="pending-count" id="lowStockItems">0</span>
+                            <span class="pending-label">Low Stock Items</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OPD Management Section -->
+        <section class="content-section" id="opd">
+            <div class="section-header enhanced">
+                <div class="header-left">
+                    <div class="breadcrumb"><i class="fas fa-home"></i> Dashboard / OPD</div>
+                    <h1><i class="fas fa-clipboard-list"></i> OPD Management</h1>
+                    <p class="section-description">Manage outpatient registrations, appointments, and consultations</p>
+                </div>
+                <div class="header-right">
+                    <div class="header-stats">
+                        <div class="mini-stat"><span class="stat-value" id="opdTodayCount">0</span><span class="stat-label">Today</span></div>
+                        <div class="mini-stat"><span class="stat-value" id="opdWaitingCount">0</span><span class="stat-label">Waiting</span></div>
+                    </div>
+                    <button class="btn-primary" id="newOPDBtn"><i class="fas fa-plus"></i> New Registration</button>
+                </div>
+            </div>
+
+            <div class="filter-bar">
+                <input type="text" id="opdSearchInput" placeholder="Search patient..." class="search-input" oninput="filterTable('opdTableBody', this.value)">
+                <select class="filter-select" id="opdDeptFilter" onchange="filterTableByColumn('opdTableBody', 3, this.value)">
+                    <option value="">All Departments</option>
+                    <option value="Cardiology">Cardiology</option>
+                    <option value="Neurology">Neurology</option>
+                    <option value="Orthopedics">Orthopedics</option>
+                    <option value="Pediatrics">Pediatrics</option>
+                </select>
+                <select class="filter-select" id="opdStatusFilter" onchange="filterTableByColumn('opdTableBody', 6, this.value)">
+                    <option value="">All Status</option>
+                    <option value="Waiting">Waiting</option>
+                    <option value="Consulting">Consulting</option>
+                    <option value="Completed">Completed</option>
+                </select>
+                <input type="date" class="filter-select" onchange="filterTableByDate('opdTableBody', 5, this.value)">
+            </div>
+
+            <div class="data-table">
+                <table id="opdTable">
+                    <thead>
+                        <tr>
+                            <th>Patient ID</th>
+                            <th>Name</th>
+                            <th>Age/Gender</th>
+                            <th>Department</th>
+                            <th>Doctor</th>
+                            <th>Appointment Time</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="opdTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- IPD Management Section -->
+        <section class="content-section" id="ipd">
+            <div class="section-header enhanced">
+                <div class="header-left">
+                    <div class="breadcrumb"><i class="fas fa-home"></i> Dashboard / IPD</div>
+                    <h1><i class="fas fa-hospital-user"></i> IPD Management</h1>
+                    <p class="section-description">Manage inpatient admissions, discharges, and ward allocations</p>
+                </div>
+                <div class="header-right">
+                    <div class="header-stats">
+                        <div class="mini-stat"><span class="stat-value" id="ipdAdmittedCount">0</span><span class="stat-label">Admitted</span></div>
+                        <div class="mini-stat"><span class="stat-value" id="ipdDischargeCount">0</span><span class="stat-label">Discharge Today</span></div>
+                    </div>
+                    <button class="btn-primary" id="newIPDBtn"><i class="fas fa-plus"></i> New Admission</button>
+                </div>
+            </div>
+
+            <div class="ipd-overview">
+                <div class="ipd-stat">
+                    <i class="fas fa-bed"></i>
+                    <div>
+                        <strong id="occupiedBedsCount">0</strong>
+                        <span>Occupied Beds</span>
+                    </div>
+                </div>
+                <div class="ipd-stat">
+                    <i class="fas fa-door-open"></i>
+                    <div>
+                        <strong id="availableBedsCount">90</strong>
+                        <span>Available Beds</span>
+                    </div>
+                </div>
+                <div class="ipd-stat">
+                    <i class="fas fa-user-plus"></i>
+                    <div>
+                        <strong id="newAdmissionsCount">0</strong>
+                        <span>New Admissions Today</span>
+                    </div>
+                </div>
+                <div class="ipd-stat">
+                    <i class="fas fa-user-minus"></i>
+                    <div>
+                        <strong id="dischargesTodayCount">0</strong>
+                        <span>Discharges Today</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Patient ID</th>
+                            <th>Name</th>
+                            <th>Ward/Bed</th>
+                            <th>Admission Date</th>
+                            <th>Diagnosis</th>
+                            <th>Attending Doctor</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ipdTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Emergency Section -->
+        <section class="content-section" id="emergency">
+            <div class="section-header enhanced emergency-header">
+                <div class="header-left">
+                    <div class="breadcrumb"><i class="fas fa-home"></i> Dashboard / Emergency</div>
+                    <h1><i class="fas fa-ambulance"></i> Emergency Department</h1>
+                    <p class="section-description">Handle emergency cases with triage and quick patient intake</p>
+                </div>
+                <div class="header-right">
+                    <div class="header-stats">
+                        <div class="mini-stat critical-bg"><span class="stat-value" id="emergencyActiveCount">0</span><span class="stat-label">Active Cases</span></div>
+                    </div>
+                    <button id="newEmergencyBtn" class="btn-danger pulse-btn"><i class="fas fa-plus"></i> New Emergency</button>
+                </div>
+            </div>
+
+            <div class="emergency-stats">
+                <div class="emergency-card critical">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <strong id="criticalCount">0</strong>
+                    <span>Critical</span>
+                </div>
+                <div class="emergency-card urgent">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong id="urgentCount">0</strong>
+                    <span>Urgent</span>
+                </div>
+                <div class="emergency-card stable">
+                    <i class="fas fa-check-circle"></i>
+                    <strong id="stableCount">0</strong>
+                    <span>Stable</span>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Patient</th>
+                            <th>Chief Complaint</th>
+                            <th>Triage Level</th>
+                            <th>Vital Signs</th>
+                            <th>Assigned To</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="emergencyTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- OT Scheduling Section -->
+        <section class="content-section" id="ot">
+            <div class="section-header enhanced">
+                <div class="header-left">
+                    <div class="breadcrumb"><i class="fas fa-home"></i> Dashboard / Operation Theater</div>
+                    <h1><i class="fas fa-procedures"></i> Operation Theater Scheduling</h1>
+                    <p class="section-description">Schedule surgeries, manage OT rooms, and track procedures</p>
+                </div>
+                <div class="header-right">
+                    <div class="header-stats">
+                        <div class="mini-stat"><span class="stat-value" id="otTodayCount">0</span><span class="stat-label">Today's Surgeries</span></div>
+                        <div class="mini-stat"><span class="stat-value" id="otInProgressCount">0</span><span class="stat-label">In Progress</span></div>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn-secondary" onclick="showOTConfigModal()"><i class="fas fa-cog"></i> Configure OT</button>
+                        <button class="btn-primary" id="scheduleOTBtn"><i class="fas fa-plus"></i> Schedule Surgery</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ot-rooms">
+                <!-- OT rooms will be loaded dynamically -->
+            </div>
+
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date/Time</th>
+                            <th>Patient</th>
+                            <th>Procedure</th>
+                            <th>Surgeon</th>
+                            <th>OT Room</th>
+                            <th>Duration</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="otTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Laboratory Section -->
+        <section class="content-section" id="lab">
+            <div class="section-header enhanced">
+                <div class="header-left">
+                    <div class="breadcrumb"><i class="fas fa-home"></i> Dashboard / Laboratory</div>
+                    <h1><i class="fas fa-flask"></i> Laboratory Management</h1>
+                    <p class="section-description">Order lab tests, track samples, and manage test results</p>
+                </div>
+                <div class="header-right">
+                    <div class="header-stats">
+                        <div class="mini-stat"><span class="stat-value" id="labQueueCount">0</span><span class="stat-label">In Queue</span></div>
+                        <div class="mini-stat"><span class="stat-value" id="labTodayCount">0</span><span class="stat-label">Completed Today</span></div>
+                    </div>
+                    <button class="btn-primary" id="newLabTestBtn"><i class="fas fa-plus"></i> New Test Order</button>
+                </div>
+            </div>
+
+            <div class="lab-stats">
+                <div class="lab-stat">
+                    <i class="fas fa-vial"></i>
+                    <strong id="pendingTestsCount">0</strong>
+                    <span>Pending Tests</span>
+                </div>
+                <div class="lab-stat">
+                    <i class="fas fa-microscope"></i>
+                    <strong id="inProgressTestsCount">0</strong>
+                    <span>In Progress</span>
+                </div>
+                <div class="lab-stat">
+                    <i class="fas fa-check-circle"></i>
+                    <strong id="completedTestsCount">0</strong>
+                    <span>Completed Today</span>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Test ID</th>
+                            <th>Patient</th>
+                            <th>Test Type</th>
+                            <th>Ordered By</th>
+                            <th>Order Time</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="labTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Radiology Section -->
+        <section class="content-section" id="radiology">
+            <div class="section-header enhanced">
+                <div class="header-left">
+                    <div class="breadcrumb"><i class="fas fa-home"></i> Dashboard / Radiology</div>
+                    <h1><i class="fas fa-x-ray"></i> Radiology Department</h1>
+                    <p class="section-description">Manage imaging orders, view reports, and schedule scans</p>
+                </div>
+                <div class="header-right">
+                    <div class="header-stats">
+                        <div class="mini-stat"><span class="stat-value" id="radiologyQueueCount">0</span><span class="stat-label">In Queue</span></div>
+                        <div class="mini-stat"><span class="stat-value" id="radiologyTodayCount">0</span><span class="stat-label">Completed Today</span></div>
+                    </div>
+                    <button class="btn-primary" id="newRadiologyBtn"><i class="fas fa-plus"></i> New Imaging Order</button>
+                </div>
+            </div>
+
+            <div class="radiology-modalities">
+                <div class="modality-card" onclick="filterRadiology('X-Ray')">
+                    <i class="fas fa-x-ray"></i>
+                    <h4>X-Ray</h4>
+                    <span class="modality-count" id="xrayCount">0 pending</span>
+                </div>
+                <div class="modality-card" onclick="filterRadiology('CT Scan')">
+                    <i class="fas fa-brain"></i>
+                    <h4>CT Scan</h4>
+                    <span class="modality-count" id="ctCount">0 pending</span>
+                </div>
+                <div class="modality-card" onclick="filterRadiology('MRI')">
+                    <i class="fas fa-magnet"></i>
+                    <h4>MRI</h4>
+                    <span class="modality-count" id="mriCount">0 pending</span>
+                </div>
+                <div class="modality-card" onclick="filterRadiology('Ultrasound')">
+                    <i class="fas fa-heartbeat"></i>
+                    <h4>Ultrasound</h4>
+                    <span class="modality-count" id="ultrasoundCount">0 pending</span>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Patient</th>
+                            <th>Modality</th>
+                            <th>Body Part</th>
+                            <th>Ordered By</th>
+                            <th>Scheduled Time</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="radiologyTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Pharmacy Section -->
+        <section class="content-section" id="pharmacy">
+            <div class="section-header enhanced">
+                <div class="header-left">
+                    <div class="breadcrumb"><i class="fas fa-home"></i> Dashboard / Pharmacy</div>
+                    <h1><i class="fas fa-pills"></i> Pharmacy Management</h1>
+                    <p class="section-description">Dispense medications, manage inventory, and track prescriptions</p>
+                </div>
+                <div class="header-right">
+                    <div class="header-stats">
+                        <div class="mini-stat"><span class="stat-value" id="rxPendingCount">0</span><span class="stat-label">Pending Rx</span></div>
+                        <div class="mini-stat warning-bg"><span class="stat-value" id="rxLowStockCount">0</span><span class="stat-label">Low Stock</span></div>
+                    </div>
+                    <button class="btn-primary" id="newPrescriptionBtn"><i class="fas fa-plus"></i> New Prescription</button>
+                </div>
+            </div>
+
+            <div class="pharmacy-stats">
+                <div class="pharmacy-stat">
+                    <i class="fas fa-prescription"></i>
+                    <strong id="pendingRxCount">0</strong>
+                    <span>Pending Prescriptions</span>
+                </div>
+                <div class="pharmacy-stat">
+                    <i class="fas fa-boxes"></i>
+                    <strong id="medicinesInStock">0</strong>
+                    <span>Medicines in Stock</span>
+                </div>
+                <div class="pharmacy-stat alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong id="lowStockAlerts">0</strong>
+                    <span>Low Stock Alerts</span>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Prescription ID</th>
+                            <th>Patient</th>
+                            <th>Prescribed By</th>
+                            <th>Medicines</th>
+                            <th>Date/Time</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pharmacyTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Billing Section -->
+        <section class="content-section" id="billing">
+            <div class="section-header enhanced">
+                <div class="header-left">
+                    <div class="breadcrumb"><i class="fas fa-home"></i> Dashboard / Billing</div>
+                    <h1><i class="fas fa-file-invoice-dollar"></i> Billing & Revenue</h1>
+                    <p class="section-description">Generate bills, process payments, and track revenue</p>
+                </div>
+                <div class="header-right">
+                    <div class="header-stats">
+                        <div class="mini-stat success-bg"><span class="stat-value" id="billingTodayRevenue">₹0</span><span class="stat-label">Today's Revenue</span></div>
+                        <div class="mini-stat"><span class="stat-value" id="billingPendingCount">0</span><span class="stat-label">Pending Bills</span></div>
+                    </div>
+                    <button class="btn-primary" id="generateBillBtn"><i class="fas fa-plus"></i> Generate Bill</button>
+                </div>
+            </div>
+
+            <div class="billing-overview">
+                <div class="billing-card">
+                    <i class="fas fa-rupee-sign"></i>
+                    <div>
+                        <strong id="todayRevenueCount">₹0</strong>
+                        <span>Today's Revenue</span>
+                    </div>
+                </div>
+                <div class="billing-card">
+                    <i class="fas fa-file-invoice"></i>
+                    <div>
+                        <strong id="billsGeneratedCount">0</strong>
+                        <span>Bills Generated</span>
+                    </div>
+                </div>
+                <div class="billing-card">
+                    <i class="fas fa-clock"></i>
+                    <div>
+                        <strong id="pendingPaymentsCount">₹0</strong>
+                        <span>Pending Payments</span>
+                    </div>
+                </div>
+                <div class="billing-card">
+                    <i class="fas fa-chart-line"></i>
+                    <div>
+                        <strong id="monthlyRevenueCount">₹0</strong>
+                        <span>Monthly Revenue</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Bill No</th>
+                            <th>Patient</th>
+                            <th>Services</th>
+                            <th>Amount</th>
+                            <th>Payment Method</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="billingTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Insurance Section -->
+        <section class="content-section" id="insurance">
+            <div class="section-header enhanced">
+                <div class="header-left">
+                    <div class="breadcrumb"><i class="fas fa-home"></i> Dashboard / Insurance</div>
+                    <h1><i class="fas fa-file-medical-alt"></i> Insurance Claims</h1>
+                    <p class="section-description">Submit claims, track approvals, and manage insurance processes</p>
+                </div>
+                <div class="header-right">
+                    <div class="header-stats">
+                        <div class="mini-stat"><span class="stat-value" id="insurancePendingHeaderCount">0</span><span class="stat-label">Pending</span></div>
+                        <div class="mini-stat success-bg"><span class="stat-value" id="insuranceApprovedHeaderCount">0</span><span class="stat-label">Approved</span></div>
+                    </div>
+                    <button class="btn-primary" id="newClaimBtn"><i class="fas fa-plus"></i> New Claim</button>
+                </div>
+            </div>
+
+            <div class="insurance-stats">
+                <div class="insurance-stat">
+                    <i class="fas fa-file-alt"></i>
+                    <strong id="pendingClaimsCount">0</strong>
+                    <span>Pending Claims</span>
+                </div>
+                <div class="insurance-stat">
+                    <i class="fas fa-check"></i>
+                    <strong id="approvedClaimsCount">0</strong>
+                    <span>Approved This Month</span>
+                </div>
+                <div class="insurance-stat">
+                    <i class="fas fa-times"></i>
+                    <strong id="rejectedClaimsCount">0</strong>
+                    <span>Rejected</span>
+                </div>
+                <div class="insurance-stat">
+                    <i class="fas fa-rupee-sign"></i>
+                    <strong id="claimedAmountCount">₹0</strong>
+                    <span>Claimed Amount</span>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Claim ID</th>
+                            <th>Patient</th>
+                            <th>Insurance Provider</th>
+                            <th>Policy Number</th>
+                            <th>Claim Amount</th>
+                            <th>Submission Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="insuranceTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- EMR Section -->
+        <section class="content-section" id="emr">
+            <div class="section-header enhanced">
+                <div class="header-left">
+                    <div class="breadcrumb"><i class="fas fa-home"></i> Dashboard / EMR</div>
+                    <h1><i class="fas fa-notes-medical"></i> Electronic Medical Records</h1>
+                    <p class="section-description">Access patient medical history, diagnoses, and treatment records</p>
+                </div>
+                <div class="header-right">
+                    <div class="header-stats">
+                        <div class="mini-stat"><span class="stat-value" id="emrTotalRecords">0</span><span class="stat-label">Total Records</span></div>
+                    </div>
+                    <div class="header-actions">
+                        <input type="text" id="emrSearchInput" placeholder="Search patient records..." class="search-input" oninput="searchEMR(this.value)">
+                    </div>
+                </div>
+            </div>
+
+            <div class="emr-search-results" id="emrPatientList"></div>
+        </section>
+
+        <!-- Bed Management Section -->
+        <section class="content-section" id="beds">
+            <div class="section-header enhanced">
+                <div class="header-left">
+                    <div class="breadcrumb"><i class="fas fa-home"></i> Dashboard / Beds</div>
+                    <h1><i class="fas fa-bed"></i> Bed Management</h1>
+                    <p class="section-description">Monitor bed availability, manage wards, and handle patient transfers</p>
+                </div>
+                <div class="header-right">
+                    <div class="header-stats">
+                        <div class="mini-stat"><span class="stat-value" id="bedsOccupiedHeader">0</span><span class="stat-label">Occupied</span></div>
+                        <div class="mini-stat success-bg"><span class="stat-value" id="bedsAvailableHeader">0</span><span class="stat-label">Available</span></div>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn-secondary" onclick="refreshBedStatus()"><i class="fas fa-sync"></i> Refresh</button>
+                        <button class="btn-secondary" onclick="openManageWardsModal()"><i class="fas fa-cog"></i> Manage Wards</button>
+                        <button class="btn-secondary" onclick="openAddBedModal()"><i class="fas fa-plus-circle"></i> Add Bed</button>
+                        <button class="btn-primary" onclick="openBedTransferModal()"><i class="fas fa-exchange-alt"></i> Transfer Patient</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bed Statistics -->
+            <div class="bed-stats">
+                <div class="bed-stat-card" onclick="filterBedsByStatus('all')">
+                    <div class="bed-stat-icon total"><i class="fas fa-bed"></i></div>
+                    <div class="bed-stat-info">
+                        <span class="bed-stat-value" id="totalBedsCount">0</span>
+                        <span class="bed-stat-label">Total Beds</span>
+                    </div>
+                </div>
+                <div class="bed-stat-card" onclick="filterBedsByStatus('occupied')">
+                    <div class="bed-stat-icon occupied"><i class="fas fa-user-injured"></i></div>
+                    <div class="bed-stat-info">
+                        <span class="bed-stat-value" id="occupiedBedsTotal">0</span>
+                        <span class="bed-stat-label">Occupied</span>
+                    </div>
+                </div>
+                <div class="bed-stat-card" onclick="filterBedsByStatus('available')">
+                    <div class="bed-stat-icon available"><i class="fas fa-check-circle"></i></div>
+                    <div class="bed-stat-info">
+                        <span class="bed-stat-value" id="availableBedsTotal">0</span>
+                        <span class="bed-stat-label">Available</span>
+                    </div>
+                </div>
+                <div class="bed-stat-card" onclick="filterBedsByStatus('critical')">
+                    <div class="bed-stat-icon critical"><i class="fas fa-heartbeat"></i></div>
+                    <div class="bed-stat-info">
+                        <span class="bed-stat-value" id="criticalBedsCount">0</span>
+                        <span class="bed-stat-label">Critical</span>
+                    </div>
+                </div>
+                <div class="bed-stat-card" onclick="filterBedsByStatus('maintenance')">
+                    <div class="bed-stat-icon maintenance"><i class="fas fa-tools"></i></div>
+                    <div class="bed-stat-info">
+                        <span class="bed-stat-value" id="maintenanceBedsCount">0</span>
+                        <span class="bed-stat-label">Maintenance</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ward Filter Tabs - Dynamically Generated -->
+            <div class="ward-tabs" id="wardTabsContainer">
+                <!-- Ward tabs will be dynamically generated -->
+            </div>
+
+            <!-- Bed Overview Grid -->
+            <div class="bed-overview" id="bedOverviewContainer">
+                <!-- Dynamic bed grids will be loaded here -->
+            </div>
+
+            <!-- Bed Legend -->
+            <div class="bed-legend">
+                <div class="legend-item"><span class="legend-color available"></span> Available</div>
+                <div class="legend-item"><span class="legend-color occupied"></span> Occupied</div>
+                <div class="legend-item"><span class="legend-color critical"></span> Critical</div>
+                <div class="legend-item"><span class="legend-color maintenance"></span> Maintenance</div>
+                <div class="legend-item"><span class="legend-color reserved"></span> Reserved</div>
+            </div>
+        </section>
+
+        <!-- HR Management Section -->
+        <section class="content-section" id="hr">
+            <div class="section-header enhanced">
+                <div class="header-left">
+                    <div class="breadcrumb"><i class="fas fa-home"></i> Dashboard / HR</div>
+                    <h1><i class="fas fa-users"></i> HR Management</h1>
+                    <p class="section-description">Manage staff records, attendance, schedules, and payroll</p>
+                </div>
+                <div class="header-right">
+                    <div class="header-stats">
+                        <div class="mini-stat"><span class="stat-value" id="hrTotalStaff">0</span><span class="stat-label">Total Staff</span></div>
+                        <div class="mini-stat success-bg"><span class="stat-value" id="hrPresentToday">0</span><span class="stat-label">Present Today</span></div>
+                    </div>
+                    <button class="btn-primary" id="addStaffBtn"><i class="fas fa-user-plus"></i> Add Staff</button>
+                </div>
+            </div>
+
+            <div class="hr-stats">
+                <div class="hr-stat">
+                    <i class="fas fa-user-md"></i>
+                    <strong id="doctorsCount">0</strong>
+                    <span>Doctors</span>
+                </div>
+                <div class="hr-stat">
+                    <i class="fas fa-user-nurse"></i>
+                    <strong id="nursesCount">0</strong>
+                    <span>Nurses</span>
+                </div>
+                <div class="hr-stat">
+                    <i class="fas fa-users-cog"></i>
+                    <strong id="supportStaffCount">0</strong>
+                    <span>Support Staff</span>
+                </div>
+                <div class="hr-stat">
+                    <i class="fas fa-user-check"></i>
+                    <strong id="presentTodayCount">0</strong>
+                    <span>Present Today</span>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Employee ID</th>
+                            <th>Name</th>
+                            <th>Department</th>
+                            <th>Designation</th>
+                            <th>Contact</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="hrTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Inventory Section -->
+        <section class="content-section" id="inventory">
+            <div class="section-header enhanced">
+                <div class="header-left">
+                    <div class="breadcrumb"><i class="fas fa-home"></i> Dashboard / Inventory</div>
+                    <h1><i class="fas fa-warehouse"></i> Inventory Management</h1>
+                    <p class="section-description">Track stock levels, manage supplies, and monitor expiry dates</p>
+                </div>
+                <div class="header-right">
+                    <div class="header-stats">
+                        <div class="mini-stat"><span class="stat-value" id="inventoryTotalItems">0</span><span class="stat-label">Total Items</span></div>
+                        <div class="mini-stat warning-bg"><span class="stat-value" id="inventoryLowStock">0</span><span class="stat-label">Low Stock</span></div>
+                    </div>
+                    <button class="btn-primary" id="addInventoryBtn"><i class="fas fa-plus"></i> Add Item</button>
+                </div>
+            </div>
+
+            <div class="inventory-categories">
+                <div class="category-tab active" data-category="medicines" onclick="filterInventory('medicines')">
+                    <i class="fas fa-pills"></i> Medicines
+                </div>
+                <div class="category-tab" data-category="equipment" onclick="filterInventory('equipment')">
+                    <i class="fas fa-tools"></i> Equipment
+                </div>
+                <div class="category-tab" data-category="consumables" onclick="filterInventory('consumables')">
+                    <i class="fas fa-syringe"></i> Consumables
+                </div>
+                <div class="category-tab" data-category="linens" onclick="filterInventory('linens')">
+                    <i class="fas fa-bed"></i> Linens
+                </div>
+            </div>
+
+            <div class="inventory-alerts">
+                <div class="alert-box warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span><strong id="lowStockItemsCount">0</strong> items are running low on stock</span>
+                </div>
+                <div class="alert-box danger">
+                    <i class="fas fa-times-circle"></i>
+                    <span><strong id="outOfStockCount">0</strong> items are out of stock</span>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item Code</th>
+                            <th>Item Name</th>
+                            <th>Category</th>
+                            <th>Current Stock</th>
+                            <th>Reorder Level</th>
+                            <th>Last Updated</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Analytics Section - Advanced MIS Dashboard -->
+        <section class="content-section" id="analytics">
+            <div class="section-header">
+                <h1><i class="fas fa-chart-line"></i> Analytics & MIS Dashboard</h1>
+                <div class="header-actions">
+                    <div class="date-range-picker">
+                        <input type="date" id="analyticsStartDate" class="date-input">
+                        <span>to</span>
+                        <input type="date" id="analyticsEndDate" class="date-input">
+                    </div>
+                    <select class="chart-filter" id="analyticsPeriod" onchange="updateAnalyticsPeriod(this.value)">
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month" selected>This Month</option>
+                        <option value="quarter">This Quarter</option>
+                        <option value="year">This Year</option>
+                    </select>
+                    <button class="btn-secondary" onclick="refreshAnalytics()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    <button class="btn-primary" onclick="exportAnalyticsReport()"><i class="fas fa-download"></i> Export Report</button>
+                </div>
+            </div>
+
+            <!-- Executive Summary Cards -->
+            <div class="analytics-summary-bar">
+                <div class="summary-stat">
+                    <i class="fas fa-heartbeat"></i>
+                    <div class="summary-info">
+                        <span class="summary-value" id="analyticsTotalPatients">0</span>
+                        <span class="summary-label">Total Patients</span>
+                    </div>
+                </div>
+                <div class="summary-stat">
+                    <i class="fas fa-rupee-sign"></i>
+                    <div class="summary-info">
+                        <span class="summary-value" id="analyticsTotalRevenue">₹0</span>
+                        <span class="summary-label">Total Revenue</span>
+                    </div>
+                </div>
+                <div class="summary-stat">
+                    <i class="fas fa-procedures"></i>
+                    <div class="summary-info">
+                        <span class="summary-value" id="analyticsSurgeries">0</span>
+                        <span class="summary-label">Surgeries</span>
+                    </div>
+                </div>
+                <div class="summary-stat">
+                    <i class="fas fa-bed"></i>
+                    <div class="summary-info">
+                        <span class="summary-value" id="analyticsOccupancy">0%</span>
+                        <span class="summary-label">Bed Occupancy</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPI Cards Row -->
+            <div class="analytics-kpis">
+                <div class="kpi-card clickable" onclick="showKPIDetails('satisfaction')">
+                    <div class="kpi-header">
+                        <span class="kpi-icon satisfaction"><i class="fas fa-smile"></i></span>
+                        <span class="kpi-badge positive">+6%</span>
+                    </div>
+                    <h4>Patient Satisfaction</h4>
+                    <div class="kpi-value" id="patientSatisfaction">4.7<span class="kpi-unit">/5</span></div>
+                    <div class="kpi-sparkline" id="satisfactionSparkline"></div>
+                    <div class="kpi-trend positive" id="satisfactionTrend"><i class="fas fa-arrow-up"></i> +0.3 from last month</div>
+                </div>
+                <div class="kpi-card clickable" onclick="showKPIDetails('waitTime')">
+                    <div class="kpi-header">
+                        <span class="kpi-icon wait-time"><i class="fas fa-clock"></i></span>
+                        <span class="kpi-badge positive">-22%</span>
+                    </div>
+                    <h4>Avg. Wait Time</h4>
+                    <div class="kpi-value" id="avgWaitTime">18<span class="kpi-unit">min</span></div>
+                    <div class="kpi-sparkline" id="waitTimeSparkline"></div>
+                    <div class="kpi-trend positive" id="waitTimeTrend"><i class="fas fa-arrow-down"></i> -5 min improvement</div>
+                </div>
+                <div class="kpi-card clickable" onclick="showKPIDetails('bedTurnover')">
+                    <div class="kpi-header">
+                        <span class="kpi-icon bed-turnover"><i class="fas fa-exchange-alt"></i></span>
+                        <span class="kpi-badge neutral">0%</span>
+                    </div>
+                    <h4>Bed Turnover Rate</h4>
+                    <div class="kpi-value" id="bedTurnoverRate">2.3<span class="kpi-unit">days</span></div>
+                    <div class="kpi-sparkline" id="turnoverSparkline"></div>
+                    <div class="kpi-trend" id="bedTurnoverTrend"><i class="fas fa-minus"></i> Same as last month</div>
+                </div>
+                <div class="kpi-card clickable" onclick="showKPIDetails('revenuePerPatient')">
+                    <div class="kpi-header">
+                        <span class="kpi-icon revenue"><i class="fas fa-chart-line"></i></span>
+                        <span class="kpi-badge positive">+12%</span>
+                    </div>
+                    <h4>Revenue Per Patient</h4>
+                    <div class="kpi-value" id="revenuePerPatient">₹6,825</div>
+                    <div class="kpi-sparkline" id="revenueSparkline"></div>
+                    <div class="kpi-trend positive" id="revenueTrend"><i class="fas fa-arrow-up"></i> +12% increase</div>
+                </div>
+                <div class="kpi-card clickable" onclick="showKPIDetails('readmission')">
+                    <div class="kpi-header">
+                        <span class="kpi-icon readmission"><i class="fas fa-redo"></i></span>
+                        <span class="kpi-badge negative">+2%</span>
+                    </div>
+                    <h4>Readmission Rate</h4>
+                    <div class="kpi-value" id="readmissionRate">3.2<span class="kpi-unit">%</span></div>
+                    <div class="kpi-sparkline" id="readmissionSparkline"></div>
+                    <div class="kpi-trend negative" id="readmissionTrend"><i class="fas fa-arrow-up"></i> +0.2% from last month</div>
+                </div>
+                <div class="kpi-card clickable" onclick="showKPIDetails('mortality')">
+                    <div class="kpi-header">
+                        <span class="kpi-icon mortality"><i class="fas fa-heartbeat"></i></span>
+                        <span class="kpi-badge positive">-15%</span>
+                    </div>
+                    <h4>Mortality Rate</h4>
+                    <div class="kpi-value" id="mortalityRate">0.8<span class="kpi-unit">%</span></div>
+                    <div class="kpi-sparkline" id="mortalitySparkline"></div>
+                    <div class="kpi-trend positive" id="mortalityTrend"><i class="fas fa-arrow-down"></i> -0.1% improvement</div>
+                </div>
+            </div>
+
+            <!-- Main Charts Row -->
+            <div class="analytics-grid-2col">
+                <div class="chart-card analytics-chart">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-area"></i> Revenue Trend Analysis</h3>
+                        <div class="chart-actions">
+                            <button class="chart-btn active" data-type="line" onclick="changeRevenueChartType('line')">Line</button>
+                            <button class="chart-btn" data-type="bar" onclick="changeRevenueChartType('bar')">Bar</button>
+                        </div>
+                    </div>
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="analyticsRevenueTrendChart"></canvas>
+                    </div>
+                    <div class="chart-legend-custom" id="revenueLegend">
+                        <div class="legend-item"><span class="legend-dot opd"></span> OPD Revenue</div>
+                        <div class="legend-item"><span class="legend-dot ipd"></span> IPD Revenue</div>
+                        <div class="legend-item"><span class="legend-dot pharmacy"></span> Pharmacy</div>
+                        <div class="legend-item"><span class="legend-dot lab"></span> Lab & Imaging</div>
+                    </div>
+                </div>
+                <div class="chart-card analytics-chart">
+                    <div class="card-header">
+                        <h3><i class="fas fa-users"></i> Patient Flow Analysis</h3>
+                        <select class="mini-filter" id="patientFlowType" onchange="updatePatientFlowAnalytics(this.value)">
+                            <option value="all">All Departments</option>
+                            <option value="opd">OPD Only</option>
+                            <option value="ipd">IPD Only</option>
+                            <option value="emergency">Emergency</option>
+                        </select>
+                    </div>
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="patientFlowAnalyticsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Department Performance Section -->
+            <div class="analytics-section-title">
+                <h2><i class="fas fa-building"></i> Department Performance</h2>
+                <p>Comparative analysis across all hospital departments</p>
+            </div>
+            <div class="analytics-grid-3col">
+                <div class="chart-card analytics-chart">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-pie"></i> Revenue by Department</h3>
+                    </div>
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="analyticsDeptRevenueChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card analytics-chart">
+                    <div class="card-header">
+                        <h3><i class="fas fa-user-friends"></i> Patient Distribution</h3>
+                    </div>
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="departmentPatientsChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card analytics-chart">
+                    <div class="card-header">
+                        <h3><i class="fas fa-star"></i> Department Ratings</h3>
+                    </div>
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="departmentRatingsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Department Performance Table -->
+            <div class="analytics-table-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-table"></i> Department Performance Metrics</h3>
+                    <button class="btn-icon" onclick="exportDepartmentMetrics()"><i class="fas fa-download"></i></button>
+                </div>
+                <div class="analytics-table-container">
+                    <table class="analytics-table">
+                        <thead>
+                            <tr>
+                                <th>Department</th>
+                                <th>Patients</th>
+                                <th>Revenue</th>
+                                <th>Avg. Stay</th>
+                                <th>Satisfaction</th>
+                                <th>Efficiency</th>
+                                <th>Trend</th>
+                            </tr>
+                        </thead>
+                        <tbody id="departmentMetricsBody">
+                            <tr>
+                                <td><span class="dept-badge cardiology">Cardiology</span></td>
+                                <td>245</td>
+                                <td>₹18.5L</td>
+                                <td>4.2 days</td>
+                                <td><div class="rating-bar"><div class="rating-fill" style="width: 92%"></div></div> 4.6</td>
+                                <td><span class="efficiency-badge high">92%</span></td>
+                                <td><span class="trend-indicator up"><i class="fas fa-arrow-up"></i></span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="dept-badge neurology">Neurology</span></td>
+                                <td>189</td>
+                                <td>₹14.2L</td>
+                                <td>5.1 days</td>
+                                <td><div class="rating-bar"><div class="rating-fill" style="width: 88%"></div></div> 4.4</td>
+                                <td><span class="efficiency-badge high">88%</span></td>
+                                <td><span class="trend-indicator up"><i class="fas fa-arrow-up"></i></span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="dept-badge orthopedics">Orthopedics</span></td>
+                                <td>312</td>
+                                <td>₹22.8L</td>
+                                <td>6.3 days</td>
+                                <td><div class="rating-bar"><div class="rating-fill" style="width: 90%"></div></div> 4.5</td>
+                                <td><span class="efficiency-badge medium">85%</span></td>
+                                <td><span class="trend-indicator stable"><i class="fas fa-minus"></i></span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="dept-badge pediatrics">Pediatrics</span></td>
+                                <td>278</td>
+                                <td>₹12.4L</td>
+                                <td>3.1 days</td>
+                                <td><div class="rating-bar"><div class="rating-fill" style="width: 96%"></div></div> 4.8</td>
+                                <td><span class="efficiency-badge high">94%</span></td>
+                                <td><span class="trend-indicator up"><i class="fas fa-arrow-up"></i></span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="dept-badge general">General Medicine</span></td>
+                                <td>456</td>
+                                <td>₹16.9L</td>
+                                <td>2.8 days</td>
+                                <td><div class="rating-bar"><div class="rating-fill" style="width: 86%"></div></div> 4.3</td>
+                                <td><span class="efficiency-badge medium">82%</span></td>
+                                <td><span class="trend-indicator down"><i class="fas fa-arrow-down"></i></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Financial Analysis Section -->
+            <div class="analytics-section-title">
+                <h2><i class="fas fa-rupee-sign"></i> Financial Analysis</h2>
+                <p>Revenue streams, collections, and financial health indicators</p>
+            </div>
+            <div class="analytics-grid-4col">
+                <div class="finance-card">
+                    <div class="finance-icon collections"><i class="fas fa-hand-holding-usd"></i></div>
+                    <div class="finance-info">
+                        <span class="finance-label">Total Collections</span>
+                        <span class="finance-value" id="totalCollections">₹45.8L</span>
+                        <span class="finance-change positive">+8.5% vs last period</span>
+                    </div>
+                </div>
+                <div class="finance-card">
+                    <div class="finance-icon outstanding"><i class="fas fa-exclamation-circle"></i></div>
+                    <div class="finance-info">
+                        <span class="finance-label">Outstanding Dues</span>
+                        <span class="finance-value" id="outstandingDues">₹12.3L</span>
+                        <span class="finance-change negative">23% of total billing</span>
+                    </div>
+                </div>
+                <div class="finance-card">
+                    <div class="finance-icon insurance"><i class="fas fa-shield-alt"></i></div>
+                    <div class="finance-info">
+                        <span class="finance-label">Insurance Claims</span>
+                        <span class="finance-value" id="insuranceClaims">₹28.4L</span>
+                        <span class="finance-change positive">92% approval rate</span>
+                    </div>
+                </div>
+                <div class="finance-card">
+                    <div class="finance-icon expenses"><i class="fas fa-receipt"></i></div>
+                    <div class="finance-info">
+                        <span class="finance-label">Operating Expenses</span>
+                        <span class="finance-value" id="operatingExpenses">₹32.1L</span>
+                        <span class="finance-change neutral">On budget</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="analytics-grid-2col">
+                <div class="chart-card analytics-chart">
+                    <div class="card-header">
+                        <h3><i class="fas fa-coins"></i> Revenue Streams Breakdown</h3>
+                    </div>
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="revenueStreamsChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card analytics-chart">
+                    <div class="card-header">
+                        <h3><i class="fas fa-wallet"></i> Payment Methods Distribution</h3>
+                    </div>
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="paymentMethodsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Operational Metrics Section -->
+            <div class="analytics-section-title">
+                <h2><i class="fas fa-cogs"></i> Operational Metrics</h2>
+                <p>Resource utilization, efficiency, and operational KPIs</p>
+            </div>
+            <div class="analytics-grid-2col">
+                <div class="chart-card analytics-chart">
+                    <div class="card-header">
+                        <h3><i class="fas fa-bed"></i> Bed Utilization by Ward</h3>
+                    </div>
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="bedUtilizationChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card analytics-chart">
+                    <div class="card-header">
+                        <h3><i class="fas fa-procedures"></i> OT Utilization</h3>
+                    </div>
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="otUtilizationChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Staff Performance Section -->
+            <div class="analytics-section-title">
+                <h2><i class="fas fa-user-md"></i> Staff Performance</h2>
+                <p>Doctor productivity, staff efficiency, and workload distribution</p>
+            </div>
+            <div class="staff-performance-grid">
+                <div class="staff-ranking-card">
+                    <h3><i class="fas fa-trophy"></i> Top Performing Doctors</h3>
+                    <div class="staff-ranking-list" id="topDoctorsList">
+                        <div class="ranking-item">
+                            <span class="rank gold">1</span>
+                            <img src="https://ui-avatars.com/api/?name=Dr+Rajesh&background=0891b2&color=fff" class="ranking-avatar">
+                            <div class="ranking-info">
+                                <span class="ranking-name">Dr. Rajesh Kumar</span>
+                                <span class="ranking-dept">Cardiology</span>
+                            </div>
+                            <div class="ranking-stats">
+                                <span class="ranking-value">156</span>
+                                <span class="ranking-label">Patients</span>
+                            </div>
+                        </div>
+                        <div class="ranking-item">
+                            <span class="rank silver">2</span>
+                            <img src="https://ui-avatars.com/api/?name=Dr+Priya&background=8b5cf6&color=fff" class="ranking-avatar">
+                            <div class="ranking-info">
+                                <span class="ranking-name">Dr. Priya Sharma</span>
+                                <span class="ranking-dept">Neurology</span>
+                            </div>
+                            <div class="ranking-stats">
+                                <span class="ranking-value">142</span>
+                                <span class="ranking-label">Patients</span>
+                            </div>
+                        </div>
+                        <div class="ranking-item">
+                            <span class="rank bronze">3</span>
+                            <img src="https://ui-avatars.com/api/?name=Dr+Amit&background=10b981&color=fff" class="ranking-avatar">
+                            <div class="ranking-info">
+                                <span class="ranking-name">Dr. Amit Singh</span>
+                                <span class="ranking-dept">Orthopedics</span>
+                            </div>
+                            <div class="ranking-stats">
+                                <span class="ranking-value">128</span>
+                                <span class="ranking-label">Patients</span>
+                            </div>
+                        </div>
+                        <div class="ranking-item">
+                            <span class="rank">4</span>
+                            <img src="https://ui-avatars.com/api/?name=Dr+Meera&background=f59e0b&color=fff" class="ranking-avatar">
+                            <div class="ranking-info">
+                                <span class="ranking-name">Dr. Meera Patel</span>
+                                <span class="ranking-dept">Pediatrics</span>
+                            </div>
+                            <div class="ranking-stats">
+                                <span class="ranking-value">118</span>
+                                <span class="ranking-label">Patients</span>
+                            </div>
+                        </div>
+                        <div class="ranking-item">
+                            <span class="rank">5</span>
+                            <img src="https://ui-avatars.com/api/?name=Dr+Suresh&background=ef4444&color=fff" class="ranking-avatar">
+                            <div class="ranking-info">
+                                <span class="ranking-name">Dr. Suresh Reddy</span>
+                                <span class="ranking-dept">General Medicine</span>
+                            </div>
+                            <div class="ranking-stats">
+                                <span class="ranking-value">105</span>
+                                <span class="ranking-label">Patients</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card analytics-chart">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-bar"></i> Doctor Workload Distribution</h3>
+                    </div>
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="doctorWorkloadChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demographics Section -->
+            <div class="analytics-section-title">
+                <h2><i class="fas fa-chart-pie"></i> Patient Demographics</h2>
+                <p>Age distribution, gender ratio, and geographic analysis</p>
+            </div>
+            <div class="analytics-grid-3col">
+                <div class="chart-card analytics-chart">
+                    <div class="card-header">
+                        <h3><i class="fas fa-birthday-cake"></i> Age Distribution</h3>
+                    </div>
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="analyticsAgeChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card analytics-chart">
+                    <div class="card-header">
+                        <h3><i class="fas fa-venus-mars"></i> Gender Distribution</h3>
+                    </div>
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="genderChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card analytics-chart">
+                    <div class="card-header">
+                        <h3><i class="fas fa-map-marker-alt"></i> Patient Geography</h3>
+                    </div>
+                    <div class="geography-stats" id="geographyStats">
+                        <div class="geo-item">
+                            <span class="geo-name">Mumbai</span>
+                            <div class="geo-bar"><div class="geo-fill" style="width: 45%"></div></div>
+                            <span class="geo-value">45%</span>
+                        </div>
+                        <div class="geo-item">
+                            <span class="geo-name">Thane</span>
+                            <div class="geo-bar"><div class="geo-fill" style="width: 25%"></div></div>
+                            <span class="geo-value">25%</span>
+                        </div>
+                        <div class="geo-item">
+                            <span class="geo-name">Navi Mumbai</span>
+                            <div class="geo-bar"><div class="geo-fill" style="width: 15%"></div></div>
+                            <span class="geo-value">15%</span>
+                        </div>
+                        <div class="geo-item">
+                            <span class="geo-name">Pune</span>
+                            <div class="geo-bar"><div class="geo-fill" style="width: 10%"></div></div>
+                            <span class="geo-value">10%</span>
+                        </div>
+                        <div class="geo-item">
+                            <span class="geo-name">Others</span>
+                            <div class="geo-bar"><div class="geo-fill" style="width: 5%"></div></div>
+                            <span class="geo-value">5%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Predictive Analytics Section -->
+            <div class="analytics-section-title">
+                <h2><i class="fas fa-brain"></i> Predictive Analytics & Insights</h2>
+                <p>AI-powered forecasting and trend predictions</p>
+            </div>
+            <div class="predictive-analytics-grid">
+                <div class="prediction-card">
+                    <div class="prediction-header">
+                        <i class="fas fa-chart-line"></i>
+                        <h4>Revenue Forecast</h4>
+                    </div>
+                    <div class="prediction-content">
+                        <div class="prediction-value">₹58.2L</div>
+                        <div class="prediction-label">Predicted Next Month</div>
+                        <div class="prediction-confidence">
+                            <span>Confidence:</span>
+                            <div class="confidence-bar"><div class="confidence-fill" style="width: 87%"></div></div>
+                            <span>87%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="prediction-card">
+                    <div class="prediction-header">
+                        <i class="fas fa-users"></i>
+                        <h4>Patient Volume Forecast</h4>
+                    </div>
+                    <div class="prediction-content">
+                        <div class="prediction-value">1,850</div>
+                        <div class="prediction-label">Expected Patients</div>
+                        <div class="prediction-confidence">
+                            <span>Confidence:</span>
+                            <div class="confidence-bar"><div class="confidence-fill" style="width: 92%"></div></div>
+                            <span>92%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="prediction-card">
+                    <div class="prediction-header">
+                        <i class="fas fa-bed"></i>
+                        <h4>Bed Demand Prediction</h4>
+                    </div>
+                    <div class="prediction-content">
+                        <div class="prediction-value">85%</div>
+                        <div class="prediction-label">Expected Occupancy</div>
+                        <div class="prediction-confidence">
+                            <span>Confidence:</span>
+                            <div class="confidence-bar"><div class="confidence-fill" style="width: 78%"></div></div>
+                            <span>78%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="prediction-card alert">
+                    <div class="prediction-header">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h4>Risk Alerts</h4>
+                    </div>
+                    <div class="prediction-content">
+                        <div class="alert-list">
+                            <div class="alert-item warning">
+                                <i class="fas fa-pills"></i>
+                                <span>5 medicines reaching low stock</span>
+                            </div>
+                            <div class="alert-item info">
+                                <i class="fas fa-calendar"></i>
+                                <span>High patient volume expected on weekends</span>
+                            </div>
+                            <div class="alert-item success">
+                                <i class="fas fa-check-circle"></i>
+                                <span>All equipment maintenance up to date</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comparison Analytics -->
+            <div class="analytics-section-title">
+                <h2><i class="fas fa-balance-scale"></i> Period Comparison</h2>
+                <p>Compare performance across different time periods</p>
+            </div>
+            <div class="comparison-card">
+                <div class="comparison-header">
+                    <div class="comparison-selector">
+                        <select id="comparisonPeriod1">
+                            <option value="thisMonth">This Month</option>
+                            <option value="lastMonth">Last Month</option>
+                            <option value="thisQuarter">This Quarter</option>
+                        </select>
+                        <span class="vs-badge">VS</span>
+                        <select id="comparisonPeriod2">
+                            <option value="lastMonth" selected>Last Month</option>
+                            <option value="lastQuarter">Last Quarter</option>
+                            <option value="lastYear">Same Period Last Year</option>
+                        </select>
+                    </div>
+                    <button class="btn-secondary" onclick="runComparison()"><i class="fas fa-sync"></i> Compare</button>
+                </div>
+                <div class="comparison-grid">
+                    <div class="comparison-metric">
+                        <span class="comparison-label">Total Revenue</span>
+                        <div class="comparison-values">
+                            <span class="current">₹52.4L</span>
+                            <span class="vs-arrow positive"><i class="fas fa-arrow-up"></i> 12%</span>
+                            <span class="previous">₹46.8L</span>
+                        </div>
+                    </div>
+                    <div class="comparison-metric">
+                        <span class="comparison-label">Patient Count</span>
+                        <div class="comparison-values">
+                            <span class="current">1,647</span>
+                            <span class="vs-arrow positive"><i class="fas fa-arrow-up"></i> 8%</span>
+                            <span class="previous">1,525</span>
+                        </div>
+                    </div>
+                    <div class="comparison-metric">
+                        <span class="comparison-label">Avg. Wait Time</span>
+                        <div class="comparison-values">
+                            <span class="current">18 min</span>
+                            <span class="vs-arrow positive"><i class="fas fa-arrow-down"></i> 22%</span>
+                            <span class="previous">23 min</span>
+                        </div>
+                    </div>
+                    <div class="comparison-metric">
+                        <span class="comparison-label">Satisfaction Score</span>
+                        <div class="comparison-values">
+                            <span class="current">4.7</span>
+                            <span class="vs-arrow positive"><i class="fas fa-arrow-up"></i> 6%</span>
+                            <span class="previous">4.4</span>
+                        </div>
+                    </div>
+                    <div class="comparison-metric">
+                        <span class="comparison-label">Bed Occupancy</span>
+                        <div class="comparison-values">
+                            <span class="current">82%</span>
+                            <span class="vs-arrow neutral"><i class="fas fa-minus"></i> 0%</span>
+                            <span class="previous">82%</span>
+                        </div>
+                    </div>
+                    <div class="comparison-metric">
+                        <span class="comparison-label">Surgeries</span>
+                        <div class="comparison-values">
+                            <span class="current">89</span>
+                            <span class="vs-arrow positive"><i class="fas fa-arrow-up"></i> 15%</span>
+                            <span class="previous">77</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section class="content-section" id="settings">
+            <div class="section-header">
+                <h1><i class="fas fa-cog"></i> System Settings</h1>
+                <button class="btn-primary" onclick="saveSettings()"><i class="fas fa-save"></i> Save Changes</button>
+            </div>
+
+            <div class="settings-grid">
+                <div class="settings-card">
+                    <h3><i class="fas fa-hospital"></i> Hospital Information</h3>
+                    <form class="settings-form">
+                        <div class="form-group">
+                            <label>Hospital Name</label>
+                            <input type="text" value="MediCare Plus Hospital">
+                        </div>
+                        <div class="form-group">
+                            <label>Registration Number</label>
+                            <input type="text" value="HOSP-2023-001">
+                        </div>
+                        <div class="form-group">
+                            <label>Address</label>
+                            <textarea>123 Healthcare Avenue, Mumbai, Maharashtra 400001</textarea>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="settings-card">
+                    <h3><i class="fas fa-users-cog"></i> User Roles & Permissions</h3>
+                    <div class="role-list">
+                        <div class="role-item">
+                            <strong>Administrator</strong>
+                            <span>Full system access</span>
+                        </div>
+                        <div class="role-item">
+                            <strong>Doctor</strong>
+                            <span>Clinical modules access</span>
+                        </div>
+                        <div class="role-item">
+                            <strong>Nurse</strong>
+                            <span>Patient care modules</span>
+                        </div>
+                        <div class="role-item">
+                            <strong>Billing Officer</strong>
+                            <span>Billing & finance access</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-card">
+                    <h3><i class="fas fa-shield-alt"></i> Security Settings</h3>
+                    <div class="settings-toggle">
+                        <label>Two-Factor Authentication</label>
+                        <input type="checkbox" class="toggle-switch" checked>
+                    </div>
+                    <div class="settings-toggle">
+                        <label>Audit Logging</label>
+                        <input type="checkbox" class="toggle-switch" checked>
+                    </div>
+                    <div class="settings-toggle">
+                        <label>Auto Logout (30 min inactivity)</label>
+                        <input type="checkbox" class="toggle-switch" checked>
+                    </div>
+                </div>
+
+                <div class="settings-card">
+                    <h3><i class="fas fa-database"></i> Backup & Data</h3>
+                    <div class="backup-info">
+                        <p>Last Backup: <span id="lastBackupTime">Dec 27, 2025 03:00 AM</span></p>
+                        <button class="btn-secondary" onclick="downloadBackup()"><i class="fas fa-download"></i> Download Backup</button>
+                        <button class="btn-primary" onclick="runBackupNow()"><i class="fas fa-sync"></i> Run Backup Now</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modals will be dynamically created by JavaScript -->
+    <div id="modalContainer"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/api.js?v=14"></script>
+    <script src="js/dashboard.js?v=15"></script>
+    <script src="js/enhanced.js?v=14"></script>
+</body>
+</html>

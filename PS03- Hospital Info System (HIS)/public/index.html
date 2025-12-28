@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Information System - MediCare Plus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=16">
+    <link rel="stylesheet" href="css/enhanced.css?v=16">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="landing-page">
+    <!-- Navigation Header -->
+    <nav class="nav-header">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <i class="fas fa-hospital"></i>
+                    <span>MediCare Plus</span>
+                </div>
+                <div class="nav-links">
+                    <a href="#features">Features</a>
+                    <a href="#modules">Modules</a>
+                    <a href="#about">About</a>
+                    <a href="#contact">Contact</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Unified Hospital Information System</h1>
+                    <p>Digitize end-to-end hospital operations across clinical, administrative, and financial workflows</p>
+                    <div class="hero-stats">
+                        <div class="stat">
+                            <i class="fas fa-bed"></i>
+                            <div>
+                                <strong>500+</strong>
+                                <span>Beds Managed</span>
+                            </div>
+                        </div>
+                        <div class="stat">
+                            <i class="fas fa-user-md"></i>
+                            <div>
+                                <strong>200+</strong>
+                                <span>Healthcare Staff</span>
+                            </div>
+                        </div>
+                        <div class="stat">
+                            <i class="fas fa-heartbeat"></i>
+                            <div>
+                                <strong>10K+</strong>
+                                <span>Patients/Month</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="login-card">
+                    <div class="login-header">
+                        <i class="fas fa-user-shield"></i>
+                        <h2>System Login</h2>
+                    </div>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> Username</label>
+                            <input type="text" id="username" placeholder="Enter username" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-lock"></i> Password</label>
+                            <input type="password" id="password" placeholder="Enter password" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-user-tag"></i> Role</label>
+                            <select id="role" required>
+                                <option value="">Select Role</option>
+                                <option value="admin">Administrator</option>
+                                <option value="doctor">Doctor</option>
+                                <option value="nurse">Nurse</option>
+                                <option value="receptionist">Receptionist</option>
+                                <option value="pharmacist">Pharmacist</option>
+                                <option value="lab">Lab Technician</option>
+                                <option value="billing">Billing Officer</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> Login to Dashboard
+                        </button>
+                    </form>
+                    <div class="login-info">
+                        <p><i class="fas fa-info-circle"></i> Demo credentials: admin/admin123</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <h2 class="section-title">Comprehensive Hospital Management</h2>
+            <p class="section-subtitle">360° real-time view of patients, resources, revenue, and quality metrics</p>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-user-injured"></i></div>
+                    <h3>Patient Management</h3>
+                    <p>OPD, IPD, Emergency registration and complete EMR with medical history</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-flask"></i></div>
+                    <h3>Lab & Diagnostics</h3>
+                    <p>Integrated lab and radiology with digital reports and real-time results</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-pills"></i></div>
+                    <h3>Pharmacy System</h3>
+                    <p>Inventory management, prescription tracking, and automated billing</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-procedures"></i></div>
+                    <h3>OT & Surgery</h3>
+                    <p>Operation theater scheduling, surgical records, and resource allocation</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                    <h3>Billing & Finance</h3>
+                    <p>Automated billing, insurance claims, and revenue cycle management</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3>Analytics & MIS</h3>
+                    <p>Real-time dashboards, reports, and performance metrics</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-bed"></i></div>
+                    <h3>Bed Management</h3>
+                    <p>Real-time bed occupancy, transfers, and resource optimization</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h3>Compliance & Security</h3>
+                    <p>Role-based access, audit trails, and NABH compliance</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modules Section -->
+    <section id="modules" class="modules-section">
+        <div class="container">
+            <h2 class="section-title">Integrated Modules</h2>
+            <div class="modules-showcase">
+                <div class="module-item">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>OPD Management</span>
+                </div>
+                <div class="module-item">
+                    <i class="fas fa-hospital-user"></i>
+                    <span>IPD Management</span>
+                </div>
+                <div class="module-item">
+                    <i class="fas fa-ambulance"></i>
+                    <span>Emergency Care</span>
+                </div>
+                <div class="module-item">
+                    <i class="fas fa-microscope"></i>
+                    <span>Laboratory</span>
+                </div>
+                <div class="module-item">
+                    <i class="fas fa-x-ray"></i>
+                    <span>Radiology</span>
+                </div>
+                <div class="module-item">
+                    <i class="fas fa-prescription-bottle"></i>
+                    <span>Pharmacy</span>
+                </div>
+                <div class="module-item">
+                    <i class="fas fa-users"></i>
+                    <span>HR Management</span>
+                </div>
+                <div class="module-item">
+                    <i class="fas fa-warehouse"></i>
+                    <span>Inventory</span>
+                </div>
+                <div class="module-item">
+                    <i class="fas fa-money-check-alt"></i>
+                    <span>Billing</span>
+                </div>
+                <div class="module-item">
+                    <i class="fas fa-file-medical-alt"></i>
+                    <span>Insurance</span>
+                </div>
+                <div class="module-item">
+                    <i class="fas fa-notes-medical"></i>
+                    <span>EMR</span>
+                </div>
+                <div class="module-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section id="about" class="benefits-section">
+        <div class="container">
+            <h2 class="section-title">Business Benefits</h2>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>Fully Digitized Operations</h3>
+                    <p>Standardized hospital operations across all departments in one unified system</p>
+                </div>
+                <div class="benefit-card">
+                    <i class="fas fa-eye"></i>
+                    <h3>Real-time Visibility</h3>
+                    <p>Live dashboards for clinical activity, bed occupancy, and revenue metrics</p>
+                </div>
+                <div class="benefit-card">
+                    <i class="fas fa-link"></i>
+                    <h3>Seamless Coordination</h3>
+                    <p>Integrated workflows between clinical, diagnostic, pharmacy, and billing teams</p>
+                </div>
+                <div class="benefit-card">
+                    <i class="fas fa-shield-virus"></i>
+                    <h3>Reduced Risk</h3>
+                    <p>Minimize revenue leakage and clinical risk with proper audit trails</p>
+                </div>
+                <div class="benefit-card">
+                    <i class="fas fa-file-contract"></i>
+                    <h3>Regulatory Compliance</h3>
+                    <p>NABH-aligned documentation with role-based access and data security</p>
+                </div>
+                <div class="benefit-card">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                    <h3>Scalable Architecture</h3>
+                    <p>Configurable masters for departments, tariffs, and services</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-col">
+                    <h3><i class="fas fa-hospital"></i> MediCare Plus HIS</h3>
+                    <p>Comprehensive Hospital Information System for modern healthcare facilities</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#modules">Modules</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#">Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> support@medicareplus.com</li>
+                        <li><i class="fas fa-phone"></i> +91 1800-123-4567</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Mumbai, India</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 MediCare Plus HIS. All rights reserved. | Hackathon Project</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/login.js"></script>
+</body>
+</html>
