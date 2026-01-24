@@ -17,14 +17,18 @@ A **production-ready, full-stack Hospital Information System** designed for real
 # Install dependencies
 npm install
 
-# Seed database with sample data
-npm run seed
+# Seed database with sample data (dummy Data)
+node seeder.js
 
 # Start the server
 npm start
 
+# Start the MongoDB
+sudo net start mongoDB
+mongod
+
 # Open http://localhost:5000
-# Login: admin / admin123
+
 ```
 
 ---
