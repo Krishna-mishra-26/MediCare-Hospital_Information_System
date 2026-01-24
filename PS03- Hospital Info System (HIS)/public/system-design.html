@@ -1,0 +1,1717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Design - MediCare Plus HIS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --accent: #3b82f6;
+            --accent-light: #60a5fa;
+            --success: #22c55e;
+            --warning: #eab308;
+            --error: #ef4444;
+            --purple: #a855f7;
+            --cyan: #06b6d4;
+            --orange: #f97316;
+            --pink: #ec4899;
+            --text: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        .nav {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--accent);
+        }
+
+        .nav-brand i {
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 6rem 2rem 4rem;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding: 3rem 0;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            color: var(--accent-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--text) 0%, var(--accent-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 5rem;
+        }
+
+        .section-header {
+            margin-bottom: 2rem;
+        }
+
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-desc {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Flowchart Container */
+        .flowchart-wrapper {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            overflow-x: auto;
+        }
+
+        .flowchart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 1100px;
+            gap: 0;
+        }
+
+        /* Flow Nodes */
+        .flow-node {
+            position: relative;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 180px;
+            transition: all 0.3s ease;
+        }
+
+        .flow-node:hover {
+            transform: scale(1.02);
+        }
+
+        .flow-node.user {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3);
+        }
+
+        .flow-node.frontend {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .flow-node.backend {
+            background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
+            box-shadow: 0 4px 20px rgba(168, 85, 247, 0.3);
+        }
+
+        .flow-node.database {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            box-shadow: 0 4px 20px rgba(249, 115, 22, 0.3);
+        }
+
+        .flow-node.realtime {
+            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+            box-shadow: 0 4px 20px rgba(236, 72, 153, 0.3);
+        }
+
+        .flow-node.middleware {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            box-shadow: 0 4px 20px rgba(6, 182, 212, 0.3);
+        }
+
+        .flow-node.controller {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .flow-node.model {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
+        }
+
+        .flow-node.small {
+            padding: 0.6rem 1rem;
+            min-width: 120px;
+            font-size: 0.8rem;
+        }
+
+        .flow-node.small i {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .flow-node.small h4 {
+            font-size: 0.8rem;
+        }
+
+        .flow-node.small span {
+            font-size: 0.65rem;
+        }
+
+        .flow-node i {
+            font-size: 1.25rem;
+            margin-bottom: 0.4rem;
+            display: block;
+        }
+
+        .flow-node h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .flow-node span {
+            font-size: 0.7rem;
+            opacity: 0.9;
+        }
+
+        /* Connectors */
+        .connector {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.25rem 0;
+        }
+
+        .connector-line {
+            width: 3px;
+            height: 30px;
+            background: linear-gradient(180deg, var(--accent) 0%, var(--purple) 100%);
+            border-radius: 2px;
+        }
+
+        .connector-line.short {
+            height: 20px;
+        }
+
+        .connector-arrow {
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid var(--purple);
+        }
+
+        .connector-label {
+            background: var(--bg-tertiary);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            margin: 0.3rem 0;
+            font-weight: 500;
+        }
+
+        /* Horizontal Flow */
+        .flow-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .flow-row.spread {
+            justify-content: space-around;
+            gap: 0.5rem;
+        }
+
+        .connector-h {
+            display: flex;
+            align-items: center;
+        }
+
+        .connector-h-line {
+            width: 40px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--purple) 100%);
+            border-radius: 2px;
+        }
+
+        .connector-h-arrow {
+            width: 0;
+            height: 0;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-left: 8px solid var(--purple);
+        }
+
+        /* Bidirectional */
+        .bidirectional {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            flex-direction: column;
+        }
+
+        .bidirectional .connector-h-line {
+            background: linear-gradient(90deg, var(--success) 0%, var(--cyan) 100%);
+            width: 30px;
+        }
+
+        .bidir-arrows {
+            display: flex;
+            gap: 4px;
+            font-size: 0.7rem;
+            color: var(--cyan);
+        }
+
+        /* Layer Box */
+        .layer-box {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            position: relative;
+        }
+
+        .layer-box::before {
+            content: attr(data-label);
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: var(--bg-secondary);
+            padding: 0 0.5rem;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .layer-box.client { border-color: rgba(34, 197, 94, 0.4); }
+        .layer-box.server { border-color: rgba(168, 85, 247, 0.4); }
+        .layer-box.data { border-color: rgba(249, 115, 22, 0.4); }
+
+        /* Tech Stack Box */
+        .tech-box {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.5rem;
+            margin-top: 0.4rem;
+            display: flex;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tech-tag {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-light);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Detailed Architecture */
+        .arch-detail {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .arch-detail-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent);
+        }
+
+        .arch-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .arch-detail-col {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .arch-detail-col h5 {
+            font-size: 0.85rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .arch-detail-col h5 i {
+            font-size: 0.9rem;
+        }
+
+        .arch-detail-col ul {
+            list-style: none;
+        }
+
+        .arch-detail-col li {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            padding: 0.3rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .arch-detail-col li::before {
+            content: '→';
+            color: var(--accent);
+            font-size: 0.7rem;
+        }
+
+        .file-tree {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            background: rgba(0,0,0,0.2);
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-top: 0.5rem;
+        }
+
+        .file-tree .folder {
+            color: var(--warning);
+        }
+
+        .file-tree .file {
+            color: var(--accent-light);
+            margin-left: 1rem;
+        }
+
+        /* Architecture Layers */
+        .arch-layers {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .arch-layer {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .arch-layer-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 1rem;
+        }
+
+        .arch-layer-icon.green { background: rgba(34, 197, 94, 0.2); color: var(--success); }
+        .arch-layer-icon.blue { background: rgba(59, 130, 246, 0.2); color: var(--accent); }
+        .arch-layer-icon.purple { background: rgba(168, 85, 247, 0.2); color: var(--purple); }
+        .arch-layer-icon.orange { background: rgba(249, 115, 22, 0.2); color: var(--orange); }
+
+        .arch-layer h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .arch-layer p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .arch-layer ul {
+            list-style: none;
+            text-align: left;
+        }
+
+        .arch-layer li {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            padding: 0.4rem 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .arch-layer li:last-child {
+            border-bottom: none;
+        }
+
+        .arch-layer li i {
+            color: var(--success);
+            font-size: 0.7rem;
+        }
+
+        /* Data Flow Diagram */
+        .data-flow {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .data-flow-grid {
+            display: grid;
+            grid-template-columns: 1fr 80px 1fr 80px 1fr;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .data-flow-box {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .data-flow-box.highlight {
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .data-flow-box h5 {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .data-flow-box p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .data-flow-arrow {
+            text-align: center;
+            color: var(--accent);
+            font-size: 1.5rem;
+        }
+
+        /* Module Grid */
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .module-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .module-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .module-card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .module-card h5 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .module-card p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Database Schema */
+        .schema-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .schema-table {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .schema-table-header {
+            background: var(--bg-tertiary);
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .schema-table-header i {
+            color: var(--accent);
+        }
+
+        .schema-table-body {
+            padding: 0.75rem 1rem;
+        }
+
+        .schema-field {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.4rem 0;
+            font-size: 0.75rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .schema-field:last-child {
+            border-bottom: none;
+        }
+
+        .schema-field-name {
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .schema-field-type {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+        }
+
+        /* API Section */
+        .api-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .api-group {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.25rem;
+        }
+
+        .api-group-header {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent);
+        }
+
+        .api-endpoint {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+            font-size: 0.8rem;
+        }
+
+        .api-method {
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            min-width: 45px;
+            text-align: center;
+        }
+
+        .api-method.get { background: rgba(34, 197, 94, 0.2); color: var(--success); }
+        .api-method.post { background: rgba(59, 130, 246, 0.2); color: var(--accent); }
+        .api-method.put { background: rgba(234, 179, 8, 0.2); color: var(--warning); }
+        .api-method.delete { background: rgba(239, 68, 68, 0.2); color: var(--error); }
+
+        .api-path {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-secondary);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .stat-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+        }
+
+        .stat-box-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-box-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid var(--border);
+            margin-top: 4rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .arch-layers { grid-template-columns: repeat(2, 1fr); }
+            .stats-grid { grid-template-columns: repeat(3, 1fr); }
+            .data-flow-grid { grid-template-columns: 1fr; }
+            .data-flow-arrow { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-brand">
+            <i class="fas fa-hospital"></i>
+            <span>MediCare Plus</span>
+        </div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/dashboard.html">Dashboard</a>
+            <a href="/SD" class="active">System Design</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Hero -->
+        <div class="hero">
+            <div class="hero-badge">
+                <i class="fas fa-code"></i>
+                System Architecture Documentation
+            </div>
+            <h1>System Design</h1>
+            <p>Hospital Information System - Full-Stack Architecture with Real-Time Capabilities</p>
+        </div>
+
+        <!-- Main Architecture Flowchart -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-label">
+                    <i class="fas fa-project-diagram"></i>
+                    Architecture Overview
+                </div>
+                <h2 class="section-title">System Flowchart</h2>
+                <p class="section-desc">End-to-end request flow from client to database</p>
+            </div>
+
+            <div class="flowchart-wrapper">
+                <div class="flowchart">
+                    <!-- CLIENT LAYER -->
+                    <div class="layer-box client" data-label="Client Layer">
+                        <!-- User Layer -->
+                        <div class="flow-row spread">
+                            <div class="flow-node user small">
+                                <i class="fas fa-user-shield"></i>
+                                <h4>Admin</h4>
+                                <span>Full Access</span>
+                            </div>
+                            <div class="flow-node user small">
+                                <i class="fas fa-user-md"></i>
+                                <h4>Doctor</h4>
+                                <span>Clinical</span>
+                            </div>
+                            <div class="flow-node user small">
+                                <i class="fas fa-user-nurse"></i>
+                                <h4>Nurse</h4>
+                                <span>Patient Care</span>
+                            </div>
+                            <div class="flow-node user small">
+                                <i class="fas fa-user-tie"></i>
+                                <h4>Receptionist</h4>
+                                <span>Registration</span>
+                            </div>
+                            <div class="flow-node user small">
+                                <i class="fas fa-pills"></i>
+                                <h4>Pharmacist</h4>
+                                <span>Dispensing</span>
+                            </div>
+                        </div>
+
+                        <div class="connector">
+                            <div class="connector-line short"></div>
+                            <div class="connector-label">Browser Request</div>
+                            <div class="connector-arrow"></div>
+                        </div>
+
+                        <!-- Frontend -->
+                        <div class="flow-node frontend">
+                            <i class="fas fa-window-maximize"></i>
+                            <h4>Single Page Application</h4>
+                            <span>Vanilla JS + Chart.js + Socket.io Client</span>
+                            <div class="tech-box">
+                                <span class="tech-tag">index.html</span>
+                                <span class="tech-tag">dashboard.html</span>
+                                <span class="tech-tag">api.js</span>
+                                <span class="tech-tag">dashboard.js</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="connector">
+                        <div class="connector-line"></div>
+                        <div class="connector-label">HTTP/HTTPS + WebSocket</div>
+                        <div class="connector-arrow"></div>
+                    </div>
+
+                    <!-- SERVER LAYER -->
+                    <div class="layer-box server" data-label="Server Layer (Node.js)">
+                        <!-- Express Entry -->
+                        <div class="flow-node backend">
+                            <i class="fas fa-server"></i>
+                            <h4>Express.js Server</h4>
+                            <span>server.js - Port 5000</span>
+                            <div class="tech-box">
+                                <span class="tech-tag">express</span>
+                                <span class="tech-tag">cors</span>
+                                <span class="tech-tag">dotenv</span>
+                                <span class="tech-tag">http</span>
+                            </div>
+                        </div>
+
+                        <div class="connector">
+                            <div class="connector-line short"></div>
+                            <div class="connector-arrow"></div>
+                        </div>
+
+                        <!-- Middleware Row -->
+                        <div class="flow-row">
+                            <div class="flow-node middleware small">
+                                <i class="fas fa-shield-alt"></i>
+                                <h4>CORS</h4>
+                                <span>Cross-Origin</span>
+                            </div>
+                            <div class="flow-node middleware small">
+                                <i class="fas fa-code"></i>
+                                <h4>JSON Parser</h4>
+                                <span>Body Parsing</span>
+                            </div>
+                            <div class="flow-node middleware small">
+                                <i class="fas fa-key"></i>
+                                <h4>JWT Auth</h4>
+                                <span>Token Verify</span>
+                            </div>
+                            <div class="flow-node middleware small">
+                                <i class="fas fa-folder"></i>
+                                <h4>Static Files</h4>
+                                <span>/public</span>
+                            </div>
+                        </div>
+
+                        <div class="connector">
+                            <div class="connector-line short"></div>
+                            <div class="connector-arrow"></div>
+                        </div>
+
+                        <!-- Routes & Socket -->
+                        <div class="flow-row">
+                            <div class="flow-node backend">
+                                <i class="fas fa-route"></i>
+                                <h4>API Routes</h4>
+                                <span>/api/* endpoints</span>
+                                <div class="tech-box">
+                                    <span class="tech-tag">/auth</span>
+                                    <span class="tech-tag">/patients</span>
+                                    <span class="tech-tag">/surgeries</span>
+                                    <span class="tech-tag">/labs</span>
+                                    <span class="tech-tag">/imaging</span>
+                                    <span class="tech-tag">/prescriptions</span>
+                                    <span class="tech-tag">/bills</span>
+                                    <span class="tech-tag">/beds</span>
+                                    <span class="tech-tag">/dashboard</span>
+                                </div>
+                            </div>
+
+                            <div class="bidirectional">
+                                <div class="bidir-arrows">⟷</div>
+                                <div class="connector-h-line"></div>
+                            </div>
+
+                            <div class="flow-node realtime">
+                                <i class="fas fa-bolt"></i>
+                                <h4>Socket.io</h4>
+                                <span>Real-Time Events</span>
+                                <div class="tech-box">
+                                    <span class="tech-tag">newPatient</span>
+                                    <span class="tech-tag">newSurgery</span>
+                                    <span class="tech-tag">bedUpdate</span>
+                                    <span class="tech-tag">newBill</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="connector">
+                            <div class="connector-line short"></div>
+                            <div class="connector-arrow"></div>
+                        </div>
+
+                        <!-- Controllers -->
+                        <div class="flow-row spread">
+                            <div class="flow-node controller small">
+                                <i class="fas fa-user-lock"></i>
+                                <h4>auth.js</h4>
+                            </div>
+                            <div class="flow-node controller small">
+                                <i class="fas fa-user-injured"></i>
+                                <h4>patients.js</h4>
+                            </div>
+                            <div class="flow-node controller small">
+                                <i class="fas fa-procedures"></i>
+                                <h4>surgeries.js</h4>
+                            </div>
+                            <div class="flow-node controller small">
+                                <i class="fas fa-vial"></i>
+                                <h4>labs.js</h4>
+                            </div>
+                            <div class="flow-node controller small">
+                                <i class="fas fa-bed"></i>
+                                <h4>beds.js</h4>
+                            </div>
+                            <div class="flow-node controller small">
+                                <i class="fas fa-receipt"></i>
+                                <h4>bills.js</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="connector">
+                        <div class="connector-line"></div>
+                        <div class="connector-label">Mongoose ODM Queries</div>
+                        <div class="connector-arrow"></div>
+                    </div>
+
+                    <!-- DATA LAYER -->
+                    <div class="layer-box data" data-label="Data Layer">
+                        <!-- Models -->
+                        <div class="flow-row spread">
+                            <div class="flow-node model small">
+                                <i class="fas fa-user"></i>
+                                <h4>User</h4>
+                            </div>
+                            <div class="flow-node model small">
+                                <i class="fas fa-user-injured"></i>
+                                <h4>Patient</h4>
+                            </div>
+                            <div class="flow-node model small">
+                                <i class="fas fa-cut"></i>
+                                <h4>Surgery</h4>
+                            </div>
+                            <div class="flow-node model small">
+                                <i class="fas fa-flask"></i>
+                                <h4>LabTest</h4>
+                            </div>
+                            <div class="flow-node model small">
+                                <i class="fas fa-x-ray"></i>
+                                <h4>Imaging</h4>
+                            </div>
+                            <div class="flow-node model small">
+                                <i class="fas fa-prescription"></i>
+                                <h4>Prescription</h4>
+                            </div>
+                            <div class="flow-node model small">
+                                <i class="fas fa-file-invoice"></i>
+                                <h4>Bill</h4>
+                            </div>
+                            <div class="flow-node model small">
+                                <i class="fas fa-hospital"></i>
+                                <h4>Ward</h4>
+                            </div>
+                            <div class="flow-node model small">
+                                <i class="fas fa-bed"></i>
+                                <h4>Bed</h4>
+                            </div>
+                        </div>
+
+                        <div class="connector">
+                            <div class="connector-line short"></div>
+                            <div class="connector-arrow"></div>
+                        </div>
+
+                        <!-- MongoDB -->
+                        <div class="flow-node database">
+                            <i class="fas fa-database"></i>
+                            <h4>MongoDB</h4>
+                            <span>his_db @ 127.0.0.1:27017</span>
+                            <div class="tech-box">
+                                <span class="tech-tag">9 Collections</span>
+                                <span class="tech-tag">Document Store</span>
+                                <span class="tech-tag">BSON</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Architecture Breakdown -->
+            <div class="arch-detail">
+                <div class="arch-detail-title">
+                    <i class="fas fa-sitemap"></i>
+                    Project Structure & File Architecture
+                </div>
+                <div class="arch-detail-grid">
+                    <div class="arch-detail-col">
+                        <h5 style="color: var(--success);"><i class="fas fa-folder-open"></i> Frontend (public/)</h5>
+                        <ul>
+                            <li>index.html - Landing page</li>
+                            <li>dashboard.html - Main SPA</li>
+                            <li>system-design.html - Docs</li>
+                            <li>css/style.css - Core styles</li>
+                            <li>css/enhanced.css - UI extras</li>
+                            <li>js/api.js - API client</li>
+                            <li>js/dashboard.js - App logic</li>
+                            <li>js/login.js - Auth handler</li>
+                            <li>js/enhanced.js - Features</li>
+                        </ul>
+                    </div>
+                    <div class="arch-detail-col">
+                        <h5 style="color: var(--purple);"><i class="fas fa-server"></i> Backend (root/)</h5>
+                        <ul>
+                            <li>server.js - Entry point</li>
+                            <li>config/db.js - DB connect</li>
+                            <li>routes/*.js - 9 route files</li>
+                            <li>controllers/*.js - 9 controllers</li>
+                            <li>models/*.js - 9 schemas</li>
+                            <li>seeder.js - Sample data</li>
+                            <li>.env - Environment vars</li>
+                            <li>package.json - Dependencies</li>
+                        </ul>
+                    </div>
+                    <div class="arch-detail-col">
+                        <h5 style="color: var(--orange);"><i class="fas fa-exchange-alt"></i> Data Flow</h5>
+                        <ul>
+                            <li>User → Browser → SPA</li>
+                            <li>SPA → fetch() → Express</li>
+                            <li>Express → Route → Controller</li>
+                            <li>Controller → Mongoose → MongoDB</li>
+                            <li>MongoDB → Response → SPA</li>
+                            <li>Socket.io ⟷ Real-time sync</li>
+                            <li>JWT → Auth middleware</li>
+                            <li>bcrypt → Password hash</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Architecture Layers Detail -->
+            <div class="arch-layers">
+                <div class="arch-layer">
+                    <div class="arch-layer-icon green">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h4>Presentation</h4>
+                    <p>User Interface Layer</p>
+                    <ul>
+                        <li><i class="fas fa-check"></i> Responsive Dashboard</li>
+                        <li><i class="fas fa-check"></i> 13 Feature Modules</li>
+                        <li><i class="fas fa-check"></i> Interactive Charts</li>
+                        <li><i class="fas fa-check"></i> Toast Notifications</li>
+                    </ul>
+                </div>
+
+                <div class="arch-layer">
+                    <div class="arch-layer-icon blue">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <h4>API Gateway</h4>
+                    <p>Request Processing</p>
+                    <ul>
+                        <li><i class="fas fa-check"></i> RESTful Endpoints</li>
+                        <li><i class="fas fa-check"></i> JWT Authentication</li>
+                        <li><i class="fas fa-check"></i> RBAC Middleware</li>
+                        <li><i class="fas fa-check"></i> Request Validation</li>
+                    </ul>
+                </div>
+
+                <div class="arch-layer">
+                    <div class="arch-layer-icon purple">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h4>Business Logic</h4>
+                    <p>Core Processing</p>
+                    <ul>
+                        <li><i class="fas fa-check"></i> 9 Controllers</li>
+                        <li><i class="fas fa-check"></i> Data Validation</li>
+                        <li><i class="fas fa-check"></i> Event Emission</li>
+                        <li><i class="fas fa-check"></i> Error Handling</li>
+                    </ul>
+                </div>
+
+                <div class="arch-layer">
+                    <div class="arch-layer-icon orange">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h4>Data Layer</h4>
+                    <p>Persistence</p>
+                    <ul>
+                        <li><i class="fas fa-check"></i> MongoDB Atlas Ready</li>
+                        <li><i class="fas fa-check"></i> Mongoose Schemas</li>
+                        <li><i class="fas fa-check"></i> Auto Timestamps</li>
+                        <li><i class="fas fa-check"></i> Indexed Fields</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Flow -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-label">
+                    <i class="fas fa-stream"></i>
+                    Data Flow
+                </div>
+                <h2 class="section-title">Request-Response Cycle</h2>
+                <p class="section-desc">How data flows through the system</p>
+            </div>
+
+            <div class="data-flow">
+                <div class="data-flow-grid">
+                    <div class="data-flow-box">
+                        <h5><i class="fas fa-mouse-pointer"></i> Client Action</h5>
+                        <p>User clicks button or submits form</p>
+                    </div>
+                    <div class="data-flow-arrow"><i class="fas fa-arrow-right"></i></div>
+                    <div class="data-flow-box highlight">
+                        <h5><i class="fas fa-route"></i> API Router</h5>
+                        <p>Express routes request to controller</p>
+                    </div>
+                    <div class="data-flow-arrow"><i class="fas fa-arrow-right"></i></div>
+                    <div class="data-flow-box">
+                        <h5><i class="fas fa-database"></i> Database</h5>
+                        <p>MongoDB stores/retrieves data</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Application Modules -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-label">
+                    <i class="fas fa-th-large"></i>
+                    Modules
+                </div>
+                <h2 class="section-title">Application Modules</h2>
+                <p class="section-desc">13 integrated healthcare management modules</p>
+            </div>
+
+            <div class="module-grid">
+                <div class="module-card">
+                    <div class="module-card-icon" style="background: rgba(34, 197, 94, 0.2); color: var(--success);">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <h5>Dashboard</h5>
+                    <p>Real-time analytics & KPIs</p>
+                </div>
+                <div class="module-card">
+                    <div class="module-card-icon" style="background: rgba(59, 130, 246, 0.2); color: var(--accent);">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h5>OPD</h5>
+                    <p>Outpatient management</p>
+                </div>
+                <div class="module-card">
+                    <div class="module-card-icon" style="background: rgba(168, 85, 247, 0.2); color: var(--purple);">
+                        <i class="fas fa-procedures"></i>
+                    </div>
+                    <h5>IPD</h5>
+                    <p>Inpatient admissions</p>
+                </div>
+                <div class="module-card">
+                    <div class="module-card-icon" style="background: rgba(239, 68, 68, 0.2); color: var(--error);">
+                        <i class="fas fa-ambulance"></i>
+                    </div>
+                    <h5>Emergency</h5>
+                    <p>Critical care handling</p>
+                </div>
+                <div class="module-card">
+                    <div class="module-card-icon" style="background: rgba(6, 182, 212, 0.2); color: var(--cyan);">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <h5>Operation Theater</h5>
+                    <p>Surgery scheduling</p>
+                </div>
+                <div class="module-card">
+                    <div class="module-card-icon" style="background: rgba(234, 179, 8, 0.2); color: var(--warning);">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                    <h5>Laboratory</h5>
+                    <p>Test orders & results</p>
+                </div>
+                <div class="module-card">
+                    <div class="module-card-icon" style="background: rgba(236, 72, 153, 0.2); color: var(--pink);">
+                        <i class="fas fa-x-ray"></i>
+                    </div>
+                    <h5>Radiology</h5>
+                    <p>Imaging & scans</p>
+                </div>
+                <div class="module-card">
+                    <div class="module-card-icon" style="background: rgba(249, 115, 22, 0.2); color: var(--orange);">
+                        <i class="fas fa-pills"></i>
+                    </div>
+                    <h5>Pharmacy</h5>
+                    <p>Prescription dispensing</p>
+                </div>
+                <div class="module-card">
+                    <div class="module-card-icon" style="background: rgba(34, 197, 94, 0.2); color: var(--success);">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <h5>Billing</h5>
+                    <p>Invoice generation</p>
+                </div>
+                <div class="module-card">
+                    <div class="module-card-icon" style="background: rgba(59, 130, 246, 0.2); color: var(--accent);">
+                        <i class="fas fa-bed"></i>
+                    </div>
+                    <h5>Bed Management</h5>
+                    <p>Ward & bed tracking</p>
+                </div>
+                <div class="module-card">
+                    <div class="module-card-icon" style="background: rgba(168, 85, 247, 0.2); color: var(--purple);">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h5>Analytics</h5>
+                    <p>Advanced reporting</p>
+                </div>
+                <div class="module-card">
+                    <div class="module-card-icon" style="background: rgba(6, 182, 212, 0.2); color: var(--cyan);">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h5>Insurance</h5>
+                    <p>Claims management</p>
+                </div>
+                <div class="module-card">
+                    <div class="module-card-icon" style="background: rgba(249, 115, 22, 0.2); color: var(--orange);">
+                        <i class="fas fa-notes-medical"></i>
+                    </div>
+                    <h5>EMR</h5>
+                    <p>Electronic medical records</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Database Schema -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-label">
+                    <i class="fas fa-database"></i>
+                    Database
+                </div>
+                <h2 class="section-title">MongoDB Collections</h2>
+                <p class="section-desc">9 document collections with Mongoose schemas</p>
+            </div>
+
+            <div class="schema-grid">
+                <div class="schema-table">
+                    <div class="schema-table-header">
+                        <i class="fas fa-user"></i> User
+                    </div>
+                    <div class="schema-table-body">
+                        <div class="schema-field">
+                            <span class="schema-field-name">username</span>
+                            <span class="schema-field-type">String (unique)</span>
+                        </div>
+                        <div class="schema-field">
+                            <span class="schema-field-name">password</span>
+                            <span class="schema-field-type">String (hashed)</span>
+                        </div>
+                        <div class="schema-field">
+                            <span class="schema-field-name">role</span>
+                            <span class="schema-field-type">Enum</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="schema-table">
+                    <div class="schema-table-header">
+                        <i class="fas fa-user-injured"></i> Patient
+                    </div>
+                    <div class="schema-table-body">
+                        <div class="schema-field">
+                            <span class="schema-field-name">patientId</span>
+                            <span class="schema-field-type">String (unique)</span>
+                        </div>
+                        <div class="schema-field">
+                            <span class="schema-field-name">name</span>
+                            <span class="schema-field-type">String</span>
+                        </div>
+                        <div class="schema-field">
+                            <span class="schema-field-name">type</span>
+                            <span class="schema-field-type">OPD/IPD/Emergency</span>
+                        </div>
+                        <div class="schema-field">
+                            <span class="schema-field-name">status</span>
+                            <span class="schema-field-type">Enum</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="schema-table">
+                    <div class="schema-table-header">
+                        <i class="fas fa-procedures"></i> Surgery
+                    </div>
+                    <div class="schema-table-body">
+                        <div class="schema-field">
+                            <span class="schema-field-name">patient</span>
+                            <span class="schema-field-type">ObjectId → Patient</span>
+                        </div>
+                        <div class="schema-field">
+                            <span class="schema-field-name">surgeon</span>
+                            <span class="schema-field-type">String</span>
+                        </div>
+                        <div class="schema-field">
+                            <span class="schema-field-name">status</span>
+                            <span class="schema-field-type">Enum</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="schema-table">
+                    <div class="schema-table-header">
+                        <i class="fas fa-vial"></i> LabTest
+                    </div>
+                    <div class="schema-table-body">
+                        <div class="schema-field">
+                            <span class="schema-field-name">patient</span>
+                            <span class="schema-field-type">ObjectId → Patient</span>
+                        </div>
+                        <div class="schema-field">
+                            <span class="schema-field-name">testName</span>
+                            <span class="schema-field-type">String</span>
+                        </div>
+                        <div class="schema-field">
+                            <span class="schema-field-name">priority</span>
+                            <span class="schema-field-type">Enum</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="schema-table">
+                    <div class="schema-table-header">
+                        <i class="fas fa-x-ray"></i> Imaging
+                    </div>
+                    <div class="schema-table-body">
+                        <div class="schema-field">
+                            <span class="schema-field-name">patient</span>
+                            <span class="schema-field-type">ObjectId → Patient</span>
+                        </div>
+                        <div class="schema-field">
+                            <span class="schema-field-name">type</span>
+                            <span class="schema-field-type">X-Ray/CT/MRI</span>
+                        </div>
+                        <div class="schema-field">
+                            <span class="schema-field-name">findings</span>
+                            <span class="schema-field-type">String</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="schema-table">
+                    <div class="schema-table-header">
+                        <i class="fas fa-pills"></i> Prescription
+                    </div>
+                    <div class="schema-table-body">
+                        <div class="schema-field">
+                            <span class="schema-field-name">patient</span>
+                            <span class="schema-field-type">ObjectId → Patient</span>
+                        </div>
+                        <div class="schema-field">
+                            <span class="schema-field-name">medicines</span>
+                            <span class="schema-field-type">Array[Object]</span>
+                        </div>
+                        <div class="schema-field">
+                            <span class="schema-field-name">status</span>
+                            <span class="schema-field-type">Enum</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="schema-table">
+                    <div class="schema-table-header">
+                        <i class="fas fa-file-invoice-dollar"></i> Bill
+                    </div>
+                    <div class="schema-table-body">
+                        <div class="schema-field">
+                            <span class="schema-field-name">billNumber</span>
+                            <span class="schema-field-type">String (unique)</span>
+                        </div>
+                        <div class="schema-field">
+                            <span class="schema-field-name">items</span>
+                            <span class="schema-field-type">Array[Object]</span>
+                        </div>
+                        <div class="schema-field">
+                            <span class="schema-field-name">total</span>
+                            <span class="schema-field-type">Number</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="schema-table">
+                    <div class="schema-table-header">
+                        <i class="fas fa-building"></i> Ward
+                    </div>
+                    <div class="schema-table-body">
+                        <div class="schema-field">
+                            <span class="schema-field-name">wardId</span>
+                            <span class="schema-field-type">String (unique)</span>
+                        </div>
+                        <div class="schema-field">
+                            <span class="schema-field-name">type</span>
+                            <span class="schema-field-type">Enum (12 types)</span>
+                        </div>
+                        <div class="schema-field">
+                            <span class="schema-field-name">totalBeds</span>
+                            <span class="schema-field-type">Number</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="schema-table">
+                    <div class="schema-table-header">
+                        <i class="fas fa-bed"></i> Bed
+                    </div>
+                    <div class="schema-table-body">
+                        <div class="schema-field">
+                            <span class="schema-field-name">bedId</span>
+                            <span class="schema-field-type">String (unique)</span>
+                        </div>
+                        <div class="schema-field">
+                            <span class="schema-field-name">ward</span>
+                            <span class="schema-field-type">ObjectId → Ward</span>
+                        </div>
+                        <div class="schema-field">
+                            <span class="schema-field-name">status</span>
+                            <span class="schema-field-type">Enum (5 states)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- API Endpoints -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-label">
+                    <i class="fas fa-plug"></i>
+                    REST API
+                </div>
+                <h2 class="section-title">API Endpoints</h2>
+                <p class="section-desc">40+ RESTful endpoints across 9 route modules</p>
+            </div>
+
+            <div class="api-grid">
+                <div class="api-group">
+                    <div class="api-group-header">
+                        <i class="fas fa-key"></i> Authentication
+                    </div>
+                    <div class="api-endpoint">
+                        <span class="api-method post">POST</span>
+                        <span class="api-path">/api/auth/login</span>
+                    </div>
+                    <div class="api-endpoint">
+                        <span class="api-method post">POST</span>
+                        <span class="api-path">/api/auth/register</span>
+                    </div>
+                    <div class="api-endpoint">
+                        <span class="api-method get">GET</span>
+                        <span class="api-path">/api/auth/me</span>
+                    </div>
+                </div>
+
+                <div class="api-group">
+                    <div class="api-group-header">
+                        <i class="fas fa-user-injured"></i> Patients
+                    </div>
+                    <div class="api-endpoint">
+                        <span class="api-method get">GET</span>
+                        <span class="api-path">/api/patients</span>
+                    </div>
+                    <div class="api-endpoint">
+                        <span class="api-method post">POST</span>
+                        <span class="api-path">/api/patients</span>
+                    </div>
+                    <div class="api-endpoint">
+                        <span class="api-method put">PUT</span>
+                        <span class="api-path">/api/patients/:id</span>
+                    </div>
+                    <div class="api-endpoint">
+                        <span class="api-method delete">DEL</span>
+                        <span class="api-path">/api/patients/:id</span>
+                    </div>
+                </div>
+
+                <div class="api-group">
+                    <div class="api-group-header">
+                        <i class="fas fa-procedures"></i> Surgeries
+                    </div>
+                    <div class="api-endpoint">
+                        <span class="api-method get">GET</span>
+                        <span class="api-path">/api/surgeries</span>
+                    </div>
+                    <div class="api-endpoint">
+                        <span class="api-method post">POST</span>
+                        <span class="api-path">/api/surgeries</span>
+                    </div>
+                    <div class="api-endpoint">
+                        <span class="api-method put">PUT</span>
+                        <span class="api-path">/api/surgeries/:id</span>
+                    </div>
+                </div>
+
+                <div class="api-group">
+                    <div class="api-group-header">
+                        <i class="fas fa-bed"></i> Bed Management
+                    </div>
+                    <div class="api-endpoint">
+                        <span class="api-method get">GET</span>
+                        <span class="api-path">/api/beds/wards</span>
+                    </div>
+                    <div class="api-endpoint">
+                        <span class="api-method post">POST</span>
+                        <span class="api-path">/api/beds/:wardId/:bedId/assign</span>
+                    </div>
+                    <div class="api-endpoint">
+                        <span class="api-method post">POST</span>
+                        <span class="api-path">/api/beds/:wardId/:bedId/discharge</span>
+                    </div>
+                    <div class="api-endpoint">
+                        <span class="api-method get">GET</span>
+                        <span class="api-path">/api/beds/stats</span>
+                    </div>
+                </div>
+
+                <div class="api-group">
+                    <div class="api-group-header">
+                        <i class="fas fa-flask"></i> Laboratory
+                    </div>
+                    <div class="api-endpoint">
+                        <span class="api-method get">GET</span>
+                        <span class="api-path">/api/labs</span>
+                    </div>
+                    <div class="api-endpoint">
+                        <span class="api-method post">POST</span>
+                        <span class="api-path">/api/labs</span>
+                    </div>
+                    <div class="api-endpoint">
+                        <span class="api-method put">PUT</span>
+                        <span class="api-path">/api/labs/:id</span>
+                    </div>
+                </div>
+
+                <div class="api-group">
+                    <div class="api-group-header">
+                        <i class="fas fa-file-invoice-dollar"></i> Billing
+                    </div>
+                    <div class="api-endpoint">
+                        <span class="api-method get">GET</span>
+                        <span class="api-path">/api/bills</span>
+                    </div>
+                    <div class="api-endpoint">
+                        <span class="api-method post">POST</span>
+                        <span class="api-path">/api/bills</span>
+                    </div>
+                    <div class="api-endpoint">
+                        <span class="api-method put">PUT</span>
+                        <span class="api-path">/api/bills/:id</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project Stats -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-label">
+                    <i class="fas fa-chart-bar"></i>
+                    Metrics
+                </div>
+                <h2 class="section-title">Project Statistics</h2>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-box-value">13</div>
+                    <div class="stat-box-label">Modules</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-box-value">9</div>
+                    <div class="stat-box-label">Collections</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-box-value">40+</div>
+                    <div class="stat-box-label">API Endpoints</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-box-value">5</div>
+                    <div class="stat-box-label">User Roles</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-box-value">12+</div>
+                    <div class="stat-box-label">Charts</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-box-value">RT</div>
+                    <div class="stat-box-label">Real-Time</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>MediCare Plus Hospital Information System • Full-Stack Architecture</p>
+        <p style="margin-top: 0.5rem; opacity: 0.7;">Node.js • Express • MongoDB • Socket.io • Chart.js</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,34 @@
+{
+  "name": "medicare-plus-his",
+  "version": "2.0.0",
+  "description": "MediCare Plus - A production-ready Hospital Information System with real-time features, comprehensive patient management, billing, lab/radiology integration, and operation theater scheduling.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "seed": "node seeder.js",
+    "prod": "NODE_ENV=production node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["hospital", "healthcare", "patient-management", "billing", "real-time", "mongodb", "express", "nodejs"],
+  "author": "MediCare Plus Team",
+  "license": "MIT",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.0.2",
+    "morgan": "^1.10.1",
+    "nodemon": "^3.1.11",
+    "socket.io": "^4.8.3"
+  }
+}
